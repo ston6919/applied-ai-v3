@@ -23,7 +23,25 @@ export default function NewsList() {
         const apiBase = base ? base.replace(/\/$/, '') : ''
         const url = `${apiBase}/api/news/articles/`
 
+        // Debug details
+        // eslint-disable-next-line no-console
+        console.log('[News] Fetching', {
+          origin: typeof window !== 'undefined' ? window.location.origin : 'ssr',
+          NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+          apiBase,
+          url
+        })
+
         const res = await fetch(url, { next: { revalidate: 60 } })
+
+        // eslint-disable-next-line no-console
+        console.log('[News] Response', {
+          ok: res.ok,
+          status: res.status,
+          statusText: res.statusText,
+          finalURL: (res as any).url,
+          contentType: res.headers.get('content-type')
+        })
         if (!res.ok) {
           throw new Error(`Failed to fetch news: ${res.status}`)
         }
@@ -31,7 +49,12 @@ export default function NewsList() {
         const items: NewsItem[] = Array.isArray(data) ? data : (data.results ?? [])
         setNews(items)
       } catch (err: any) {
-        console.error('Error fetching news:', err)
+        // eslint-disable-next-line no-console
+        console.error('[News] Error fetching news:', {
+          name: err?.name,
+          message: err?.message,
+          stack: err?.stack
+        })
         setError(err?.message ?? 'Failed to load news')
       } finally {
         setLoading(false)
