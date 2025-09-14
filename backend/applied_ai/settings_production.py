@@ -9,12 +9,7 @@ from decouple import config
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# Allow hosts from environment variable
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-
-# Remove any empty strings from the list
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
-
+# ALLOWED_HOSTS is now handled in base settings.py
 # Debug: Print ALLOWED_HOSTS to logs
 print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 
