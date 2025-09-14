@@ -13,6 +13,9 @@ DEBUG = False
 # Debug: Print ALLOWED_HOSTS to logs
 print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 
+# Add WhiteNoise middleware for static files
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
 # Database
 DATABASES = {
     'default': {
@@ -44,7 +47,11 @@ SECURE_HSTS_PRELOAD = True
 
 # Static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATIC_URL = '/static/'
+
+# Use WhiteNoise to serve static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
