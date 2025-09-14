@@ -23,20 +23,14 @@ services:
   github:
     repo: ston6919/applied-ai-v2
     branch: main
-  run_command: gunicorn applied_ai.wsgi:application
-  build_command: pip install -r requirements.txt
+  run_command: gunicorn applied_ai.wsgi:application --settings=applied_ai.settings_production
+  build_command: pip install -r requirements.txt && python manage.py migrate
   environment_slug: python
   instance_count: 1
   instance_size_slug: basic-xxs
   routes:
   - path: /api
-  envs:
-  - key: DEBUG
-    value: "False"
-  - key: SECRET_KEY
-    value: ${SECRET_KEY}
-  - key: ALLOWED_HOSTS
-    value: ${frontend.PUBLIC_URL},${backend.PUBLIC_URL}
+  # Environment variables are set manually in DigitalOcean dashboard
 
 databases:
 - name: applied-ai-db

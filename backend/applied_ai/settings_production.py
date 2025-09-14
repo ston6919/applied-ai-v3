@@ -9,6 +9,15 @@ from decouple import config
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+# Allow hosts from environment variable
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+
+# Remove any empty strings from the list
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
+
+# Debug: Print ALLOWED_HOSTS to logs
+print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+
 # Database
 DATABASES = {
     'default': {
@@ -25,6 +34,10 @@ DATABASES = {
 CORS_ALLOWED_ORIGINS = [
     config('FRONTEND_URL', default='https://your-frontend-url.com'),
 ]
+
+# Allow all origins if FRONTEND_URL is not set (for development)
+if not config('FRONTEND_URL', default=None):
+    CORS_ALLOW_ALL_ORIGINS = True
 
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True

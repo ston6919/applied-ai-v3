@@ -5,8 +5,29 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+
+def api_root(request):
+    return JsonResponse({
+        'message': 'Applied AI API is running!',
+        'endpoints': {
+            'admin': '/admin/',
+            'news': '/api/news/',
+            'tools': '/api/tools/',
+            'automations': '/api/automations/',
+            'mastermind': '/api/mastermind/'
+        }
+    })
+
+def health_check(request):
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'Backend is running'
+    })
 
 urlpatterns = [
+    path('', api_root, name='api_root'),
+    path('health/', health_check, name='health_check'),
     path('admin/', admin.site.urls),
     path('api/news/', include('news.urls')),
     path('api/tools/', include('tools.urls')),
