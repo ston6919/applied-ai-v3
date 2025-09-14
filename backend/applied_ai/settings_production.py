@@ -5,6 +5,7 @@ Production settings for applied_ai project.
 from .settings import *
 import os
 from decouple import config
+import dj_database_url
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -16,16 +17,10 @@ print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 # Add WhiteNoise middleware for static files
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-# Database
+# Database (use DATABASE_URL provided by the platform)
+# Example: postgres://USER:PASSWORD@HOST:PORT/NAME
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='applied_ai_db'),
-        'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-    }
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
 # CORS settings for production
