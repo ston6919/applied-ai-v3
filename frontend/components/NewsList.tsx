@@ -14,41 +14,25 @@ interface NewsItem {
 export default function NewsList() {
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate API call - replace with actual API endpoint
     const fetchNews = async () => {
       try {
-        // For now, using mock data
-        const mockNews: NewsItem[] = [
-          {
-            id: 1,
-            title: "OpenAI Releases GPT-4 Turbo with Enhanced Capabilities",
-            summary: "The latest version of GPT-4 Turbo offers improved reasoning, reduced costs, and better performance across various tasks.",
-            published_at: "2024-01-15",
-            category: "AI Models",
-            url: "#"
-          },
-          {
-            id: 2,
-            title: "Google's Gemini Pro Now Available for Developers",
-            summary: "Google's multimodal AI model is now accessible through their API, offering competitive performance in text and image understanding.",
-            published_at: "2024-01-14",
-            category: "AI Models",
-            url: "#"
-          },
-          {
-            id: 3,
-            title: "AI Automation Tools See 300% Growth in Enterprise Adoption",
-            summary: "Businesses are rapidly adopting AI automation tools to streamline operations and reduce manual work.",
-            published_at: "2024-01-13",
-            category: "Business",
-            url: "#"
-          }
-        ]
-        setNews(mockNews)
-      } catch (error) {
-        console.error('Error fetching news:', error)
+        const base = process.env.NEXT_PUBLIC_API_URL || ''
+        const apiBase = base ? base.replace(/\/$/, '') : ''
+        const url = `${apiBase}/api/news/articles/`
+
+        const res = await fetch(url, { next: { revalidate: 60 } })
+        if (!res.ok) {
+          throw new Error(`Failed to fetch news: ${res.status}`)
+        }
+        const data = await res.json()
+        const items: NewsItem[] = Array.isArray(data) ? data : (data.results ?? [])
+        setNews(items)
+      } catch (err: any) {
+        console.error('Error fetching news:', err)
+        setError(err?.message ?? 'Failed to load news')
       } finally {
         setLoading(false)
       }
@@ -62,6 +46,12 @@ export default function NewsList() {
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-600">{error}</div>
     )
   }
 
