@@ -1,0 +1,46 @@
+name: applied-ai-website
+services:
+- name: frontend
+  source_dir: frontend
+  github:
+    repo: ston6919/applied-ai-v2
+    branch: main
+  run_command: npm start
+  build_command: npm run build
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  routes:
+  - path: /
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: NEXT_PUBLIC_API_URL
+    value: ${backend.PUBLIC_URL}
+
+- name: backend
+  source_dir: backend
+  github:
+    repo: ston6919/applied-ai-v2
+    branch: main
+  run_command: gunicorn applied_ai.wsgi:application
+  build_command: pip install -r requirements.txt
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  routes:
+  - path: /api
+  envs:
+  - key: DEBUG
+    value: "False"
+  - key: SECRET_KEY
+    value: ${SECRET_KEY}
+  - key: ALLOWED_HOSTS
+    value: ${frontend.PUBLIC_URL},${backend.PUBLIC_URL}
+
+databases:
+- name: applied-ai-db
+  engine: PG
+  version: "13"
+  size: db-s-dev-database
+  num_nodes: 1
