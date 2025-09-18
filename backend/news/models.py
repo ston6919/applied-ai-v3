@@ -27,11 +27,11 @@ class CanonicalNewsStory(models.Model):
 
 class CapturedNewsStory(models.Model):
     source = models.CharField(max_length=100)
-    source_id = models.IntegerField()
+    source_id = models.IntegerField(null=True, blank=True)
     url = models.URLField()
     title = models.CharField(max_length=500)
-    text = models.TextField()
-    published_date = models.DateTimeField()
+    text = models.TextField(blank=True)
+    published_date = models.DateTimeField(null=True, blank=True)
     captured_at = models.DateTimeField(auto_now_add=True)
     author = models.CharField(max_length=200, blank=True)
     canonical_story = models.ForeignKey(
@@ -47,7 +47,6 @@ class CapturedNewsStory(models.Model):
         ordering = ['-captured_at']
         verbose_name = 'Captured News Story'
         verbose_name_plural = 'Captured News Stories'
-        unique_together = ['source', 'source_id']
 
     def __str__(self):
         return f"{self.source}: {self.title}"
