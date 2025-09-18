@@ -24,13 +24,22 @@ DATABASES = {
 }
 
 # CORS settings for production
-CORS_ALLOWED_ORIGINS = [
-    config('FRONTEND_URL', default='https://your-frontend-url.com'),
-]
+# Get CORS allowed origins from environment variable
+cors_origins = config('CORS_ALLOWED_ORIGINS', default='')
+if cors_origins:
+    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(',')]
+else:
+    # Fallback to FRONTEND_URL if CORS_ALLOWED_ORIGINS is not set
+    frontend_url = config('FRONTEND_URL', default='https://www.its-applied-ai.com')
+    CORS_ALLOWED_ORIGINS = [frontend_url]
 
-# Allow all origins if FRONTEND_URL is not set (for development)
-if not config('FRONTEND_URL', default=None):
+# Allow all origins if no specific origins are configured (for development)
+if not CORS_ALLOWED_ORIGINS or CORS_ALLOWED_ORIGINS == ['']:
     CORS_ALLOW_ALL_ORIGINS = True
+
+# Debug: Print CORS settings to logs
+print(f"CORS_ALLOWED_ORIGINS: {CORS_ALLOWED_ORIGINS}")
+print(f"CORS_ALLOW_ALL_ORIGINS: {CORS_ALLOW_ALL_ORIGINS}")
 
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
