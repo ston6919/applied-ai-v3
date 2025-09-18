@@ -6,9 +6,29 @@ interface NewsItem {
   id: number
   title: string
   summary: string
-  published_at: string
-  category: string
-  url?: string
+  event_time: string
+  status: string
+  rank?: number
+  created_at: string
+  captured_stories_count: number
+}
+
+const formatDate = (iso: string): string => {
+  const d = new Date(iso)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  const day = d.getDate()
+  const suffix = (n: number) => {
+    if (n % 100 >= 11 && n % 100 <= 13) return 'th'
+    switch (n % 10) {
+      case 1: return 'st'
+      case 2: return 'nd'
+      case 3: return 'rd'
+      default: return 'th'
+    }
+  }
+  const mon = months[d.getMonth()]
+  const yr = String(d.getFullYear())
+  return `${day}${suffix(day)} ${mon} ${yr}`
 }
 
 export default function NewsList() {
@@ -21,7 +41,7 @@ export default function NewsList() {
       try {
         const base = process.env.NEXT_PUBLIC_API_URL || ''
         const apiBase = base ? base.replace(/\/$/, '') : ''
-        const url = `${apiBase}/api/news/articles/`
+        const url = `${apiBase}/api/news/canonical-stories/`
 
         // Debug details
         // eslint-disable-next-line no-console
@@ -50,7 +70,7 @@ export default function NewsList() {
         setNews(items)
       } catch (err: any) {
         // eslint-disable-next-line no-console
-        console.error('[News] Error fetching news:', {
+        console.error('[News] Error fetching news]:', {
           name: err?.name,
           message: err?.message,
           stack: err?.stack
@@ -79,32 +99,37 @@ export default function NewsList() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 gap-4">
       {news.map((item) => (
-        <article key={item.id} className="card hover:shadow-lg transition-shadow duration-300">
-          <div className="mb-4">
-            <span className="inline-block bg-primary-100 text-primary-800 text-sm font-medium px-3 py-1 rounded-full">
-              {item.category}
+        <article key={item.id} className="card p-4 hover:shadow-lg transition-shadow duration-300">
+          <div className="mb-2 flex items-center gap-3 text-sm text-gray-500">
+            <span>{formatDate(item.event_time)}</span>
+            <span className={`inline-block font-medium px-3 py-1 rounded-full ${
+              item.status === 'ranked' 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-yellow-100 text-yellow-800'
+            }`}>
+              {item.status}
             </span>
+            {item.rank && (
+              <span className="inline-block bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full">
+                Rank #{item.rank}
+              </span>
+            )}
           </div>
-          <h3 className="text-xl font-semibold mb-3 text-gray-900 line-clamp-2">
+          <h3 className="text-xl font-semibold text-gray-900">
             {item.title}
           </h3>
-          <p className="text-gray-600 mb-4 line-clamp-3">
+          <p className="text-gray-600 mt-2">
             {item.summary}
           </p>
-          <div className="flex justify-between items-center">
+          <div className="mt-3 flex justify-between items-center">
             <span className="text-sm text-gray-500">
-              {new Date(item.published_at).toLocaleDateString()}
+              {item.captured_stories_count} source{item.captured_stories_count !== 1 ? 's' : ''}
             </span>
-            {item.url && (
-              <a 
-                href={item.url} 
-                className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-              >
-                Read More →
-              </a>
-            )}
+            <span className="text-xs text-gray-400">
+              Created {formatDate(item.created_at)}
+            </span>
           </div>
         </article>
       ))}

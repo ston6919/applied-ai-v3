@@ -15,9 +15,14 @@ export default function Hero() {
           <Link href="/tools" className="btn-primary bg-white text-primary-600 hover:bg-gray-100">
             Explore Tools
           </Link>
-          <Link href="/mastermind" className="btn-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600">
+          <a
+            href="https://www.skool.com/applied-ai-mastermind-9612"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600"
+          >
             Join Mastermind
-          </Link>
+          </a>
         </div>
       </div>
     </section>

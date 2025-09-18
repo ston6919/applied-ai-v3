@@ -1,15 +1,7 @@
-import MastermindInfo from '@/components/MastermindInfo'
-
-export default function MastermindPage() {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Applied AI Mastermind</h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Join our exclusive community of AI enthusiasts, entrepreneurs, and innovators.
-        </p>
-      </div>
-      <MastermindInfo />
-    </div>
-  )
+export default function MastermindRedirect() {
+  // Client-side redirect as a fallback for any deep links
+  if (typeof window !== 'undefined') {
+    window.open('https://www.skool.com/applied-ai-mastermind-9612', '_blank', 'noopener,noreferrer')
+  }
+  return null
 }

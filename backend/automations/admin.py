@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Automation
+from .models import Template
 
 
-@admin.register(Automation)
-class AutomationAdmin(admin.ModelAdmin):
+@admin.register(Template)
+class TemplateAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'complexity', 'status', 'is_featured']
     list_filter = ['category', 'complexity', 'status', 'is_featured']
     search_fields = ['name', 'description']

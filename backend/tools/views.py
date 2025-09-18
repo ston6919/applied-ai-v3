@@ -8,7 +8,7 @@ class ToolViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tool.objects.all()
     serializer_class = ToolSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'pricing', 'is_featured']
+    filterset_fields = ['pricing', 'is_featured', 'categories']
     search_fields = ['name', 'description']
-    ordering_fields = ['rating', 'name', 'created_at']
-    ordering = ['-rating', 'name']
+    ordering_fields = ['name', 'created_at']
+    ordering = ['-created_at', 'name']

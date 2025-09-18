@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import Automation
+from .models import Template
 
 
-class AutomationSerializer(serializers.ModelSerializer):
+class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Automation
+        model = Template
         fields = '__all__'

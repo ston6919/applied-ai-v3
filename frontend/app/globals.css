@@ -8,13 +8,7 @@
   --background-end-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
+/* Force light background; remove system dark override */
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -36,6 +30,81 @@ body {
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-md p-6 border border-gray-200;
+    @apply bg-white rounded-2xl shadow-lg p-6 border border-gray-200/60;
   }
+
+  /* Gradient CTA button */
+  .btn-gradient {
+    @apply inline-flex items-center justify-center font-medium text-white rounded-full px-5 py-2 shadow-lg transition-transform duration-200;
+    background-image: linear-gradient(90deg, #6366f1, #8b5cf6 30%, #ec4899 65%, #f59e0b);
+  }
+  .btn-gradient:hover { transform: translateY(-1px); }
+
+  /* Center menu pill */
+  .menu-pill {
+    @apply hidden md:flex items-center gap-6 rounded-full px-5 py-2 shadow-sm border border-gray-200 backdrop-blur bg-white/70;
+  }
+}
+
+/* Design utilities */
+@layer utilities {
+  .gradient-text {
+    background-image: linear-gradient(90deg, #60a5fa, #8b5cf6 35%, #ec4899 70%, #f59e0b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .btn-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 20%, transparent 40%);
+    transform: translateX(-100%);
+  }
+  .btn-shimmer:hover::after {
+    transition: transform 700ms ease;
+    transform: translateX(100%);
+  }
+
+  /* Light theme hero backgrounds */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -10;
+    background:
+      radial-gradient(1200px 600px at 50% 35%, rgba(99,102,241,0.10), transparent 60%),
+      radial-gradient(900px 450px at 50% 55%, rgba(236,72,153,0.08), transparent 60%),
+      radial-gradient(700px 350px at 50% 75%, rgba(245,158,11,0.07), transparent 60%),
+      linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  }
+
+  .hero-rings {
+    position: absolute;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+    background:
+      repeating-radial-gradient(ellipse at 50% 50%, rgba(15,23,42,0.05) 0px, rgba(15,23,42,0.05) 2px, transparent 2px, transparent 140px);
+    mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 85%);
+  }
+}
+
+/* Floating color blobs */
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(40px);
+  opacity: 0.25;
+  animation: float 12s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) translateX(0px) scale(1); }
+  50% { transform: translateY(-16px) translateX(8px) scale(1.05); }
+  100% { transform: translateY(0px) translateX(0px) scale(1); }
 }

@@ -1,14 +1,24 @@
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import NewsArticle
-from .serializers import NewsArticleSerializer
+from .models import CanonicalNewsStory, CapturedNewsStory
+from .serializers import CanonicalNewsStorySerializer, CapturedNewsStorySerializer
 
 
-class NewsArticleViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = NewsArticle.objects.all()
-    serializer_class = NewsArticleSerializer
+class CanonicalNewsStoryViewSet(viewsets.ModelViewSet):
+    queryset = CanonicalNewsStory.objects.all()
+    serializer_class = CanonicalNewsStorySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'is_featured']
-    search_fields = ['title', 'summary', 'content']
-    ordering_fields = ['published_at', 'created_at']
-    ordering = ['-published_at']
+    filterset_fields = ['status']
+    search_fields = ['title', 'summary']
+    ordering_fields = ['created_at', 'event_time', 'rank']
+    ordering = ['-created_at']
+
+
+class CapturedNewsStoryViewSet(viewsets.ModelViewSet):
+    queryset = CapturedNewsStory.objects.all()
+    serializer_class = CapturedNewsStorySerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['source', 'canonical_story']
+    search_fields = ['title', 'text', 'author']
+    ordering_fields = ['captured_at', 'published_date']
+    ordering = ['-captured_at']
