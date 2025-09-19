@@ -11,7 +11,7 @@ class CanonicalNewsStory(models.Model):
     
     title = models.CharField(max_length=500)
     summary = models.TextField()
-    event_time = models.DateTimeField()
+    event_time = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='unranked')
     rank = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
