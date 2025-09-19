@@ -66,8 +66,10 @@ export default function NewsList() {
           throw new Error(`Failed to fetch news: ${res.status}`)
         }
         const data = await res.json()
-        const items: NewsItem[] = Array.isArray(data) ? data : (data.results ?? [])
-        setNews(items)
+        const allItems: NewsItem[] = Array.isArray(data) ? data : (data.results ?? [])
+        // Filter to only show ranked stories with rank 2 or higher
+        const rankedItems = allItems.filter(item => item.status === 'ranked' && item.rank && item.rank >= 2)
+        setNews(rankedItems)
       } catch (err: any) {
         // eslint-disable-next-line no-console
         console.error('[News] Error fetching news]:', {
@@ -102,27 +104,12 @@ export default function NewsList() {
     <div className="grid grid-cols-1 gap-4">
       {news.map((item) => (
         <article key={item.id} className="card p-4 hover:shadow-lg transition-shadow duration-300">
-          <div className="mb-2 flex items-center gap-3 text-sm text-gray-500">
+          <div className="mb-2 text-sm text-gray-500">
             <span>{formatDate(item.event_time)}</span>
-            <span className={`inline-block font-medium px-3 py-1 rounded-full ${
-              item.status === 'ranked' 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-yellow-100 text-yellow-800'
-            }`}>
-              {item.status}
-            </span>
-            {item.rank && (
-              <span className="inline-block bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full">
-                Rank #{item.rank}
-              </span>
-            )}
           </div>
           <h3 className="text-xl font-semibold text-gray-900">
             {item.title}
           </h3>
-          <p className="text-gray-600 mt-2">
-            {item.summary}
-          </p>
           <div className="mt-3 flex justify-between items-center">
             <span className="text-sm text-gray-500">
               {item.captured_stories_count} source{item.captured_stories_count !== 1 ? 's' : ''}
