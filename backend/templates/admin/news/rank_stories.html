@@ -1,0 +1,573 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:news_canonicalnewsstory_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module aligned">
+    <div class="header-section">
+        <h1>{{ title }}</h1>
+        <p class="subtitle">Review and rank unranked canonical news stories</p>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if unranked_stories %}
+        <div class="stories-grid">
+            {% for story in unranked_stories %}
+            <div class="story-card">
+                <div class="card-header">
+                    <h3 class="story-title">{{ story.title }}</h3>
+                    <div class="story-meta">
+                        <span class="meta-item">
+                            <i class="icon">📅</i>
+                            {{ story.event_time|date:"M d, Y" }}
+                        </span>
+                        <span class="meta-item">
+                            <i class="icon">📰</i>
+                            {{ story.captured_stories.count }} sources
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <p class="story-summary">{{ story.summary|truncatewords:30 }}</p>
+                    
+                    {% if story.captured_stories.all %}
+                    <div class="sources-section">
+                        <h4 class="sources-title">Sources ({{ story.captured_stories.count }}):</h4>
+                        <div class="sources-list">
+                            {% for captured in story.captured_stories.all %}
+                            <div class="source-item">
+                                <span class="source-name">{{ captured.source|default:"Unknown Source" }}</span>
+                                {% if captured.url %}
+                                <a href="{{ captured.url }}" target="_blank" class="view-source-btn" title="View original article">
+                                    View Article
+                                </a>
+                                {% else %}
+                                <span class="no-url">No URL</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    <div class="ranking-section">
+                        <label class="ranking-label">Rate this story:</label>
+                        <div class="rank-buttons">
+                            {% for rank in "12345" %}
+                            <form method="post" class="rank-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="story_id" value="{{ story.id }}">
+                                <input type="hidden" name="rank" value="{{ rank }}">
+                                <button type="submit" class="rank-btn rank-{{ rank }}" title="Rank {{ rank }} - {% if rank == '1' %}Low Priority{% elif rank == '2' %}Below Average{% elif rank == '3' %}Average{% elif rank == '4' %}Above Average{% else %}High Priority{% endif %}">
+                                    {{ rank }}
+                                </button>
+                            </form>
+                            {% endfor %}
+                        </div>
+                        <div class="rank-labels">
+                            <span class="rank-label">Low</span>
+                            <span class="rank-label">High</span>
+                </div>
+            </div>
+        </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🎉</div>
+            <h2>All Caught Up!</h2>
+            <p>No unranked stories found. All canonical news stories have been ranked!</p>
+        </div>
+    {% endif %}
+    
+    <div class="submit-row">
+        <a href="{% url 'admin:news_canonicalnewsstory_changelist' %}" class="button back-button">
+            ← Back to Canonical Stories
+        </a>
+    </div>
+</div>
+
+<style>
+.header-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e1e5e9;
+}
+
+.header-section h1 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.subtitle {
+    margin: 0;
+    color: #6c757d;
+    font-size: 16px;
+}
+
+.stories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.story-card {
+    background: #ffffff;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.story-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    padding: 20px 20px 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.story-title {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: white !important;
+}
+
+.story-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.icon {
+    font-size: 14px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.story-summary {
+    margin: 0 0 20px 0;
+    color: #495057;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.sources-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.sources-title {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.source-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.source-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #495057;
+    flex: 1;
+}
+
+.view-source-btn {
+    background: #667eea;
+    color: white !important;
+    text-decoration: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.view-source-btn:hover {
+    background: #5a6fd8;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.no-url {
+    color: #6c757d;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.card-footer {
+    padding: 15px 20px 20px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.ranking-section {
+    margin-bottom: 15px;
+}
+
+.ranking-label {
+    display: block;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.rank-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.rank-form {
+    display: inline-block;
+}
+
+.rank-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #6c757d;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rank-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.rank-btn.rank-1 {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.rank-btn.rank-1:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.rank-btn.rank-2 {
+    border-color: #fd7e14;
+    color: #fd7e14;
+}
+
+.rank-btn.rank-2:hover {
+    background: #fd7e14;
+    color: white;
+}
+
+.rank-btn.rank-3 {
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.rank-btn.rank-3:hover {
+    background: #ffc107;
+    color: white;
+}
+
+.rank-btn.rank-4 {
+    border-color: #20c997;
+    color: #20c997;
+}
+
+.rank-btn.rank-4:hover {
+    background: #20c997;
+    color: white;
+}
+
+.rank-btn.rank-5 {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.rank-btn.rank-5:hover {
+    background: #28a745;
+    color: white;
+}
+
+.rank-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.view-details-btn {
+    display: inline-block;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border: 1px solid #667eea;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.empty-state h2 {
+    margin: 0 0 12px 0;
+    color: #495057;
+    font-size: 24px;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 16px;
+}
+
+.alert {
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.back-button {
+    background: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.submit-row {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e5e9;
+}
+
+@media (max-width: 768px) {
+    .stories-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .rank-buttons {
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .rank-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .source-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .view-source-btn {
+        align-self: flex-end;
+    }
+}
+
+/* Dark mode support - using Django's actual dark mode selectors */
+body[data-theme="dark"] .story-title,
+body.dark-mode .story-title {
+    color: #e9ecef !important;
+}
+
+body[data-theme="dark"] .story-summary,
+body.dark-mode .story-summary {
+    color: #adb5bd !important;
+}
+
+body[data-theme="dark"] .sources-title,
+body.dark-mode .sources-title {
+    color: #e9ecef !important;
+}
+
+body[data-theme="dark"] .source-name,
+body.dark-mode .source-name {
+    color: #adb5bd !important;
+}
+
+body[data-theme="dark"] .source-item,
+body.dark-mode .source-item {
+    background: #343a40 !important;
+    border-color: #495057 !important;
+}
+
+body[data-theme="dark"] .no-url,
+body.dark-mode .no-url {
+    color: #6c757d !important;
+}
+
+body[data-theme="dark"] .card-footer,
+body.dark-mode .card-footer {
+    background: #343a40 !important;
+    border-color: #495057 !important;
+}
+
+body[data-theme="dark"] .ranking-label,
+body.dark-mode .ranking-label {
+    color: #e9ecef !important;
+}
+
+body[data-theme="dark"] .rank-label,
+body.dark-mode .rank-label {
+    color: #adb5bd !important;
+}
+
+body[data-theme="dark"] .view-details-btn,
+body.dark-mode .view-details-btn {
+    background: #495057 !important;
+    color: #e9ecef !important;
+}
+
+body[data-theme="dark"] .view-details-btn:hover,
+body.dark-mode .view-details-btn:hover {
+    background: #6c757d !important;
+    color: white !important;
+}
+
+/* Additional selectors for different Django admin dark mode implementations */
+.dark-mode .story-title,
+.dark-mode .story-summary,
+.dark-mode .sources-title,
+.dark-mode .source-name,
+.dark-mode .ranking-label,
+.dark-mode .rank-label {
+    color: #e9ecef !important;
+}
+
+.dark-mode .story-summary {
+    color: #adb5bd !important;
+}
+
+.dark-mode .source-name {
+    color: #adb5bd !important;
+}
+
+.dark-mode .source-item {
+    background: #343a40 !important;
+    border-color: #495057 !important;
+}
+
+.dark-mode .card-footer {
+    background: #343a40 !important;
+    border-color: #495057 !important;
+}
+
+.dark-mode .view-details-btn {
+    background: #495057 !important;
+    color: #e9ecef !important;
+}
+
+.dark-mode .view-details-btn:hover {
+    background: #6c757d !important;
+    color: white !important;
+}
+</style>
+{% endblock %}
