@@ -22,12 +22,25 @@ interface PaginatedResponse {
 
 const formatDate = (iso: string): string => {
   try {
-    return new Date(iso).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      timeZone: 'UTC',
-    })
+    const date = new Date(iso)
+    const day = date.getUTCDate()
+    const month = date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' })
+    const year = date.getUTCFullYear()
+    
+    // Add ordinal suffix to day
+    const getOrdinalSuffix = (day: number): string => {
+      if (day >= 11 && day <= 13) {
+        return 'th'
+      }
+      switch (day % 10) {
+        case 1: return 'st'
+        case 2: return 'nd'
+        case 3: return 'rd'
+        default: return 'th'
+      }
+    }
+    
+    return `${day}${getOrdinalSuffix(day)} ${month} ${year}`
   } catch {
     return '—'
   }
@@ -165,7 +178,7 @@ export default function NewsList() {
       {news.map((item) => (
         <article key={item.id} className="card p-4 hover:shadow-lg transition-shadow duration-300">
           <div className="mb-2 text-sm text-gray-500">
-            <span>{formatDate(item.event_time)}</span>
+            <span>{formatDate(item.created_at)}</span>
           </div>
           <h3 className="text-xl font-semibold text-gray-900">
             {item.title}
@@ -173,9 +186,6 @@ export default function NewsList() {
           <div className="mt-3 flex justify-between items-center">
             <span className="text-sm text-gray-500">
               {item.captured_stories_count} source{item.captured_stories_count !== 1 ? 's' : ''}
-            </span>
-            <span className="text-xs text-gray-400">
-              Created {formatDate(item.created_at)}
             </span>
           </div>
         </article>
