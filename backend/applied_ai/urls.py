@@ -15,7 +15,8 @@ def api_root(request):
             'news': '/api/news/',
             'tools': '/api/tools/',
             'automations': '/api/automations/',
-            'mastermind': '/api/mastermind/'
+            'mastermind': '/api/mastermind/',
+            'landing_pages': '/api/landing-pages/'
         }
     })
 
@@ -33,6 +34,7 @@ urlpatterns = [
     path('api/tools/', include('tools.urls')),
     path('api/automations/', include('automations.urls')),
     path('api/mastermind/', include('mastermind.urls')),
+    path('api/', include('landing_pages.urls')),
 ]
 
 if settings.DEBUG:

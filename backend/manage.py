@@ -2,7 +2,10 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from decouple import config
 
+# Load environment variables from .env file
+config.search_path = os.path.dirname(os.path.abspath(__file__))
 
 def main():
     """Run administrative tasks."""

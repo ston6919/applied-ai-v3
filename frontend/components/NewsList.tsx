@@ -14,29 +14,31 @@ interface NewsItem {
 }
 
 const formatDate = (iso: string): string => {
-  const d = new Date(iso)
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-  const day = d.getDate()
-  const suffix = (n: number) => {
-    if (n % 100 >= 11 && n % 100 <= 13) return 'th'
-    switch (n % 10) {
-      case 1: return 'st'
-      case 2: return 'nd'
-      case 3: return 'rd'
-      default: return 'th'
-    }
+  try {
+    return new Date(iso).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC',
+    })
+  } catch {
+    return '—'
   }
-  const mon = months[d.getMonth()]
-  const yr = String(d.getFullYear())
-  return `${day}${suffix(day)} ${mon} ${yr}`
 }
 
 export default function NewsList() {
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    
     const fetchNews = async () => {
       try {
         const base = process.env.NEXT_PUBLIC_API_URL || ''
@@ -84,9 +86,9 @@ export default function NewsList() {
     }
 
     fetchNews()
-  }, [])
+  }, [mounted])
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>

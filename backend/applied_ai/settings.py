@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'tools',
     'automations',
     'mastermind',
+    'landing_pages',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# MailerLite Configuration
+MAILERLITE_API_KEY = config('MAILERLITE_API_KEY', default='')

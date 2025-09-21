@@ -1,4 +1,5 @@
-import NewsList from '@/components/NewsList'
+import dynamic from 'next/dynamic'
+const NewsList = dynamic(() => import('@/components/NewsList'), { ssr: false })
 
 export default function NewsPage() {
   return (
