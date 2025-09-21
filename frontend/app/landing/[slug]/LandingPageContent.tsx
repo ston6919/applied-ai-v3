@@ -153,7 +153,10 @@ export default function LandingPageContent() {
               onError={(e) => {
                 // Fallback to placeholder if image doesn't exist
                 e.currentTarget.style.display = 'none'
-                e.currentTarget.nextElementSibling.style.display = 'flex'
+                const nextSibling = e.currentTarget.nextElementSibling as HTMLElement
+                if (nextSibling) {
+                  nextSibling.style.display = 'flex'
+                }
               }}
             />
             <div className="w-full h-full bg-gray-200 flex items-center justify-center absolute inset-0" style={{display: 'none'}}>
