@@ -1,28 +1,52 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <nav className="bg-white/80 backdrop-blur border-b border-gray-200">
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/80 backdrop-blur border-b border-gray-200' 
+        : 'bg-transparent border-b border-transparent backdrop-blur-none'
+    }`}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-3 items-center py-3">
           {/* Left: Logo */}
           <div className="justify-self-start">
             <Link href="/" className="group">
               <div className="flex flex-col leading-tight">
-                <span className="text-2xl font-bold text-primary-600">Applied AI</span>
-                <span className="text-xs text-gray-500 group-hover:text-primary-600">by Matt Penny</span>
+                <img 
+                  src="/AppliedAILogo.svg" 
+                  alt="Applied AI" 
+                  className="h-14 w-auto"
+                />
+                <span className={`text-xs group-hover:text-primary-600 transition-colors ${
+                  isScrolled ? 'text-gray-500' : 'text-gray-600'
+                }`}>by Matt Penny</span>
               </div>
             </Link>
           </div>
 
           {/* Center: Menu pill */}
           <div className="justify-self-center">
-            <div className="menu-pill">
+            <div className={`hidden md:flex items-center gap-6 rounded-full px-5 py-2 transition-all duration-300 ${
+              isScrolled 
+                ? 'shadow-sm border border-gray-200 backdrop-blur bg-white/70' 
+                : 'border border-gray-200/50 backdrop-blur-none bg-transparent'
+            }`}>
               <Link href="/" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Home</Link>
               <Link href="/news" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">News</Link>
               <Link href="/tools" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Tools</Link>

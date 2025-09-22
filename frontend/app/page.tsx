@@ -5,28 +5,54 @@ export default function Home() {
   return (
     <div>
       {/* Hero: Applied AI for real business outcomes */}
-      <section className="relative overflow-hidden py-24">
+      <section className="relative overflow-hidden pt-32 pb-16">
         {/* Light theme background and subtle rings */}
         <div className="hero-bg" />
         <div className="hero-rings" />
+        
+        {/* Particle effect from banner */}
+        <div className="particle-container">
+          <div className="particle particle-1"></div>
+          <div className="particle particle-2"></div>
+          <div className="particle particle-3"></div>
+          <div className="particle particle-4"></div>
+          <div className="particle particle-5"></div>
+          <div className="particle particle-6"></div>
+          <div className="particle particle-7"></div>
+          <div className="particle particle-8"></div>
+        </div>
 
         <div className="container mx-auto px-4">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-extrabold mb-6 gradient-text">
+              AI that drives results, not just looks smart
+            </h1>
+            <p className="text-xl md:text-2xl mb-6 text-gray-700">
+              We turn AI models and tools into measurable outcomes: more revenue, lower costs,
+              faster operations. Learn what to use, when to use it, and how to implement it the
+              right way in your business.
+              <br />
+              <br />
+              AI without the BS and hype.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Email capture section */}
+      <section className="py-16 relative">
+        <div className="absolute inset-0 opacity-60" style={{backgroundImage: 'linear-gradient(90deg, #6366f1, #8b5cf6 30%, #ec4899 65%, #f59e0b)'}}></div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <h1 className="text-5xl md:text-6xl font-extrabold mb-6 gradient-text">
-                Apply AI to grow profit — not just run cool demos
-              </h1>
-              <p className="text-xl md:text-2xl mb-6 max-w-2xl text-gray-700">
-                We turn models and tools into measurable outcomes: more revenue, lower costs,
-                faster operations. Learn what to use, when to use it, and how to implement it the
-                right way in your business.
-              </p>
-              <p className="text-base md:text-lg text-gray-600 max-w-xl">
-                Enter your email to get our 4‑step framework for driving revenue and sales with AI.
-              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Get our 4‑step framework for driving revenue and sales with AI
+              </h2>
             </div>
-            <div className="w-full max-w-xl md:ml-auto">
-              <EmailCapture />
+            <div className="flex justify-end">
+              <div className="max-w-lg w-full">
+                <EmailCapture />
+              </div>
             </div>
           </div>
         </div>

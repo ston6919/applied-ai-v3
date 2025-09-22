@@ -72,14 +72,110 @@ body {
 
   /* Light theme hero backgrounds */
   .hero-bg {
-    position: absolute;
-    inset: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
     z-index: -10;
     background:
       radial-gradient(1200px 600px at 50% 35%, rgba(99,102,241,0.10), transparent 60%),
       radial-gradient(900px 450px at 50% 55%, rgba(236,72,153,0.08), transparent 60%),
       radial-gradient(700px 350px at 50% 75%, rgba(245,158,11,0.07), transparent 60%),
       linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  }
+
+  /* Particle effect from banner */
+  .particle-container {
+    position: absolute;
+    inset: 0;
+    z-index: -5;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: particle-rise 8s linear infinite;
+  }
+
+  .particle-1 {
+    background: #6366f1;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 6s;
+  }
+
+  .particle-2 {
+    background: #8b5cf6;
+    left: 25%;
+    animation-delay: 1s;
+    animation-duration: 7s;
+  }
+
+  .particle-3 {
+    background: #ec4899;
+    left: 40%;
+    animation-delay: 2s;
+    animation-duration: 8s;
+  }
+
+  .particle-4 {
+    background: #f59e0b;
+    left: 55%;
+    animation-delay: 0.5s;
+    animation-duration: 6.5s;
+  }
+
+  .particle-5 {
+    background: #6366f1;
+    left: 70%;
+    animation-delay: 1.5s;
+    animation-duration: 7.5s;
+  }
+
+  .particle-6 {
+    background: #8b5cf6;
+    left: 85%;
+    animation-delay: 2.5s;
+    animation-duration: 8.5s;
+  }
+
+  .particle-7 {
+    background: #ec4899;
+    left: 15%;
+    animation-delay: 3s;
+    animation-duration: 9s;
+  }
+
+  .particle-8 {
+    background: #f59e0b;
+    left: 60%;
+    animation-delay: 3.5s;
+    animation-duration: 7s;
+  }
+
+  @keyframes particle-rise {
+    0% {
+      transform: translateY(100vh) translateX(0px) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.6;
+      transform: translateY(90vh) translateX(10px) scale(1);
+    }
+    90% {
+      opacity: 0.3;
+      transform: translateY(10vh) translateX(-5px) scale(0.8);
+    }
+    100% {
+      transform: translateY(-10vh) translateX(0px) scale(0);
+      opacity: 0;
+    }
   }
 
   .hero-rings {
