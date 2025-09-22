@@ -1,4 +1,13 @@
 /** @type {import('next').NextConfig} */
+
+// Ensure we never point to localhost in production
+const isProd = process.env.NODE_ENV === 'production'
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (!isProd ? 'http://localhost:8010' : null)
+
+if (isProd && !backendUrl) {
+  throw new Error('NEXT_PUBLIC_BACKEND_URL must be set in production')
+}
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -6,7 +15,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8010'}/api/:path*`,
+        destination: `${backendUrl}/api/:path*`,
       },
     ]
   },
