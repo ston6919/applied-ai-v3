@@ -1,21 +1,21 @@
 /** @type {import('next').NextConfig} */
 
-// Ensure we never point to localhost in production
+// Only use localhost proxy in development; never in production
 const isProd = process.env.NODE_ENV === 'production'
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (!isProd ? 'http://localhost:8010' : null)
-
-if (isProd && !backendUrl) {
-  throw new Error('NEXT_PUBLIC_BACKEND_URL must be set in production')
-}
+const devBackendUrl = 'http://localhost:8010'
 
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   async rewrites() {
+    if (isProd) {
+      // No rewrites in production to avoid pointing at localhost
+      return []
+    }
     return [
       {
         source: '/api/:path*',
-        destination: `${backendUrl}/api/:path*`,
+        destination: `${devBackendUrl}/api/:path*`,
       },
     ]
   },
