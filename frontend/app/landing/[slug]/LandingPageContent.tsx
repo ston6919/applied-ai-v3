@@ -44,7 +44,8 @@ export default function LandingPageContent() {
 
   const fetchLandingPage = async () => {
     try {
-      const response = await fetch(`http://localhost:8010/api/landing-pages/${slug}/`)
+      const base = process.env.NEXT_PUBLIC_BACKEND_URL || ''
+      const response = await fetch(`${base}/api/landing-pages/${slug}/`)
       if (!response.ok) {
         throw new Error('Landing page not found')
       }
@@ -63,7 +64,8 @@ export default function LandingPageContent() {
     setSubmitError(null)
 
     try {
-      const response = await fetch(`http://localhost:8010/api/landing-pages/${slug}/submit/`, {
+      const base = process.env.NEXT_PUBLIC_BACKEND_URL || ''
+      const response = await fetch(`${base}/api/landing-pages/${slug}/submit/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
