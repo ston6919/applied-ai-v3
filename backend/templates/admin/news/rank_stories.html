@@ -32,7 +32,11 @@
             {% for story in unranked_stories %}
             <div class="story-card">
                 <div class="card-header">
-                    <h3 class="story-title">{{ story.title }}</h3>
+                    <div class="title-row">
+                        <h3 class="story-title"><span class="story-title-text">{{ story.title }}</span></h3>
+                        <button type="button" class="edit-title-btn" aria-label="Edit title" title="Edit title">✏️</button>
+                    </div>
+                    <input class="title-edit-input" type="text" value="{{ story.title }}" aria-label="Edit title input" style="display:none;" />
                     <div class="story-meta">
                         <span class="meta-item">
                             <i class="icon">📅</i>
@@ -78,6 +82,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="story_id" value="{{ story.id }}">
                                 <input type="hidden" name="rank" value="{{ rank }}">
+                                <input type="hidden" name="title" value="{{ story.title }}">
                                 <button type="submit" class="rank-btn rank-{{ rank }}" title="Rank {{ rank }} - {% if rank == '1' %}Don't Show{% elif rank == '2' %}Below Average{% elif rank == '3' %}Average{% elif rank == '4' %}Above Average{% else %}High Priority{% endif %}">
                                     {% if rank == '1' %}(don't show){% else %}{{ rank }}{% endif %}
                                 </button>
@@ -361,6 +366,46 @@
     font-weight: 500;
 }
 
+.title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.story-title {
+    flex: 1;
+}
+
+.edit-title-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 8px;
+    line-height: 1;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.edit-title-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.edit-title-btn.active {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.title-edit-input {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
 .view-details-btn {
     display: inline-block;
     color: #667eea;
@@ -522,6 +567,20 @@ body.dark-mode .rank-label {
     color: #adb5bd !important;
 }
 
+body[data-theme="dark"] .title-edit-input,
+body.dark-mode .title-edit-input {
+    background: #343a40 !important;
+    color: #e9ecef !important;
+    border-color: #495057 !important;
+}
+
+body[data-theme="dark"] .edit-title-btn,
+body.dark-mode .edit-title-btn {
+    background: rgba(73, 80, 87, 0.6) !important;
+    color: #e9ecef !important;
+    border-color: #6c757d !important;
+}
+
 body[data-theme="dark"] .view-details-btn,
 body.dark-mode .view-details-btn {
     background: #495057 !important;
@@ -572,4 +631,104 @@ body.dark-mode .view-details-btn:hover {
     color: white !important;
 }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.story-card').forEach(function(cardEl) {
+        const titleText = cardEl.querySelector('.story-title-text');
+        const titleInput = cardEl.querySelector('.title-edit-input');
+        const editBtn = cardEl.querySelector('.edit-title-btn');
+        const forms = cardEl.querySelectorAll('form.rank-form');
+        const storyIdInput = cardEl.querySelector('input[name="story_id"]');
+        const csrfInput = cardEl.querySelector('input[name="csrfmiddlewaretoken"]');
+
+        function applyTitleToForms(value) {
+            forms.forEach(function(formEl) {
+                const hidden = formEl.querySelector('input[name="title"]');
+                if (hidden) hidden.value = value;
+            });
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function getCsrfToken() {
+            return (csrfInput && csrfInput.value) || getCookie('csrftoken') || '';
+        }
+
+        function saveTitleAjax() {
+            try {
+                const storyId = storyIdInput ? storyIdInput.value : null;
+                const titleVal = titleInput ? titleInput.value : (titleText ? titleText.textContent : '');
+                const csrfToken = getCsrfToken();
+                if (!storyId || !csrfToken) return;
+
+                const params = new URLSearchParams();
+                params.append('story_id', storyId);
+                params.append('action', 'update_title');
+                params.append('title', titleVal);
+                params.append('csrfmiddlewaretoken', csrfToken);
+
+                fetch(window.location.pathname, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: params
+                }).catch(function() { /* ignore for now */ });
+            } catch (e) { /* ignore */ }
+        }
+
+        if (editBtn && titleInput && titleText) {
+            editBtn.addEventListener('click', function() {
+                const isVisible = titleInput.style.display !== 'none';
+                if (isVisible) {
+                    titleInput.style.display = 'none';
+                    titleText.style.display = '';
+                    editBtn.classList.remove('active');
+                } else {
+                    titleInput.value = titleText.textContent.trim();
+                    titleInput.style.display = '';
+                    titleText.style.display = 'none';
+                    editBtn.classList.add('active');
+                    titleInput.focus();
+                    titleInput.select();
+                }
+            });
+
+            titleInput.addEventListener('input', function() {
+                titleText.textContent = titleInput.value;
+                applyTitleToForms(titleInput.value);
+            });
+
+            titleInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveTitleAjax();
+                    editBtn.click();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    titleInput.value = titleText.textContent;
+                    editBtn.click();
+                }
+            });
+
+            titleInput.addEventListener('blur', function() {
+                saveTitleAjax();
+                editBtn.click();
+            });
+        }
+
+        forms.forEach(function(formEl) {
+            formEl.addEventListener('submit', function() {
+                const hidden = formEl.querySelector('input[name="title"]');
+                if (hidden) {
+                    hidden.value = titleInput ? titleInput.value : (titleText ? titleText.textContent : '');
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

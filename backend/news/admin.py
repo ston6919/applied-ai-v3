@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import path
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from .models import CanonicalNewsStory, CapturedNewsStory
 
@@ -14,6 +14,7 @@ def rank_stories_view(request):
         story_id = request.POST.get('story_id')
         rank = request.POST.get('rank')
         action = request.POST.get('action')
+        new_title = request.POST.get('title')
         
         if story_id and action == 'undo':
             # Handle undo action
@@ -26,10 +27,27 @@ def rank_stories_view(request):
                 return redirect('admin:news_canonicalnewsstory_rank_stories')
             except Exception as e:
                 messages.error(request, f'Error unranking story: {str(e)}')
+        elif story_id and action == 'update_title':
+            # Handle ajax title update
+            try:
+                story = get_object_or_404(CanonicalNewsStory, id=story_id)
+                if new_title is not None:
+                    story.title = new_title.strip()
+                    story.save(update_fields=['title'])
+                return JsonResponse({
+                    'ok': True,
+                    'story_id': story.id,
+                    'title': story.title,
+                })
+            except Exception as e:
+                return JsonResponse({'ok': False, 'error': str(e)}, status=400)
         elif story_id and rank:
             # Handle ranking action
             try:
                 story = get_object_or_404(CanonicalNewsStory, id=story_id)
+                # Save title change if provided
+                if new_title is not None and new_title.strip() != '' and new_title.strip() != story.title:
+                    story.title = new_title.strip()
                 story.rank = int(rank)
                 story.status = 'ranked'
                 story.save()
