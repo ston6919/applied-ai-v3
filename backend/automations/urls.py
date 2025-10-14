@@ -1,10 +1,7 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import TemplateViewSet
 
-router = DefaultRouter()
-router.register(r'', TemplateViewSet)
+# Template URLs have been removed - use n8n_templates app instead
 
 urlpatterns = [
-    path('', include(router.urls)),
+    # No URLs - automations app is now empty
 ]

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'automations',
     'mastermind',
     'landing_pages',
+    'n8n_templates',
 ]
 
 MIDDLEWARE = [

@@ -50,7 +50,7 @@ export default function Navbar() {
               <Link href="/" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Home</Link>
               <Link href="/news" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">News</Link>
               <Link href="/tools" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Tools</Link>
-              <Link href="/automations" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Templates</Link>
+              <Link href="/templates" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Templates</Link>
             </div>
           </div>
 
@@ -87,7 +87,7 @@ export default function Navbar() {
               <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors">Home</Link>
               <Link href="/news" className="text-gray-700 hover:text-primary-600 transition-colors">News</Link>
               <Link href="/tools" className="text-gray-700 hover:text-primary-600 transition-colors">Tools</Link>
-              <Link href="/automations" className="text-gray-700 hover:text-primary-600 transition-colors">Templates</Link>
+              <Link href="/templates" className="text-gray-700 hover:text-primary-600 transition-colors">Templates</Link>
               <a
                 href="https://www.skool.com/applied-ai-mastermind-9612"
                 target="_blank"

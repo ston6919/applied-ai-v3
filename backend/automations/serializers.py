@@ -1,8 +1,3 @@
 from rest_framework import serializers
-from .models import Template
 
-
-class TemplateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Template
-        fields = '__all__'
+# Template serializer has been removed - use n8n_templates app instead

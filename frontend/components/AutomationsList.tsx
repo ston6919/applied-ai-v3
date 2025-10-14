@@ -1,92 +1,96 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
-interface Automation {
+interface N8nTemplate {
   id: number
   name: string
   description: string
-  category: string
-  complexity: 'Beginner' | 'Intermediate' | 'Advanced'
-  time_saved: string
-  status: 'Available' | 'Coming Soon'
+  download_url: string
+  external_id: string | null
+  score: number
+  created_at: string
+  updated_at: string
 }
 
-export default function AutomationsList() {
-  const [automations, setAutomations] = useState<Automation[]>([])
+interface SearchResult {
+  template: N8nTemplate
+  relevance_score: number
+  metadata: any
+}
+
+interface AutomationsListProps {
+  searchQuery?: string
+  onSearchResults?: (results: SearchResult[]) => void
+}
+
+export default function AutomationsList({ searchQuery, onSearchResults }: AutomationsListProps) {
+  const [templates, setTemplates] = useState<N8nTemplate[]>([])
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(true)
+  const [searching, setSearching] = useState(false)
 
   useEffect(() => {
-    // Simulate API call - replace with actual API endpoint
-    const fetchAutomations = async () => {
+    const fetchTemplates = async () => {
       try {
-        // Mock data
-        const mockAutomations: Automation[] = [
-          {
-            id: 1,
-            name: "Email Response Automation",
-            description: "Automatically categorize and draft responses to incoming emails using AI.",
-            category: "Communication",
-            complexity: "Intermediate",
-            time_saved: "2-3 hours/week",
-            status: "Available"
-          },
-          {
-            id: 2,
-            name: "Social Media Content Scheduler",
-            description: "Generate and schedule social media posts across multiple platforms automatically.",
-            category: "Marketing",
-            complexity: "Beginner",
-            time_saved: "5-7 hours/week",
-            status: "Available"
-          },
-          {
-            id: 3,
-            name: "Data Report Generator",
-            description: "Automatically generate weekly/monthly reports from your data sources.",
-            category: "Analytics",
-            complexity: "Advanced",
-            time_saved: "4-6 hours/week",
-            status: "Available"
-          },
-          {
-            id: 4,
-            name: "Customer Support Bot",
-            description: "AI-powered chatbot that handles common customer inquiries 24/7.",
-            category: "Customer Service",
-            complexity: "Advanced",
-            time_saved: "10-15 hours/week",
-            status: "Coming Soon"
-          },
-          {
-            id: 5,
-            name: "Invoice Processing",
-            description: "Automatically extract data from invoices and update your accounting system.",
-            category: "Finance",
-            complexity: "Intermediate",
-            time_saved: "3-4 hours/week",
-            status: "Available"
-          },
-          {
-            id: 6,
-            name: "Lead Qualification",
-            description: "Automatically score and qualify leads based on predefined criteria.",
-            category: "Sales",
-            complexity: "Intermediate",
-            time_saved: "2-3 hours/week",
-            status: "Coming Soon"
-          }
-        ]
-        setAutomations(mockAutomations)
+        const response = await fetch('http://127.0.0.1:8010/api/n8n-templates/templates/')
+        if (!response.ok) {
+          throw new Error('Failed to fetch templates')
+        }
+        const data = await response.json()
+        setTemplates(data.results || data)
       } catch (error) {
-        console.error('Error fetching automations:', error)
+        console.error('Error fetching n8n templates:', error)
+        setTemplates([])
       } finally {
         setLoading(false)
       }
     }
 
-    fetchAutomations()
+    fetchTemplates()
   }, [])
+
+  const performSearch = useCallback(async () => {
+    if (!searchQuery || searchQuery.trim() === '') {
+      setSearchResults([])
+      return
+    }
+
+    setSearching(true)
+    
+    try {
+      const response = await fetch('http://127.0.0.1:8010/api/n8n-templates/templates/search/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      })
+
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(`Search failed with status ${response.status}: ${data.error || 'Unknown error'}`)
+      }
+      
+      setSearchResults(data.results || [])
+      if (onSearchResults) {
+        onSearchResults(data.results || [])
+      }
+    } catch (error) {
+      console.error('Search error:', error)
+      setSearchResults([])
+    } finally {
+      setSearching(false)
+    }
+  }, [searchQuery, onSearchResults])
+
+  // Expose search function to parent component
+  useEffect(() => {
+    if (onSearchResults) {
+      onSearchResults(performSearch)
+    }
+  }, [onSearchResults, performSearch])
 
   if (loading) {
     return (
@@ -96,57 +100,77 @@ export default function AutomationsList() {
     )
   }
 
+  if (searching) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <span className="ml-3 text-gray-600">Searching...</span>
+      </div>
+    )
+  }
+
+  // Determine which templates to display
+  const displayTemplates = searchQuery && searchQuery.trim() !== '' && searchResults.length > 0 
+    ? searchResults.map(result => result.template)
+    : templates
+
+  if (displayTemplates.length === 0 && !loading) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-500 text-lg">
+          {searchQuery 
+            ? `No templates found for "${searchQuery}". Try a different search term.`
+            : 'No n8n templates available yet. Check back soon!'
+          }
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {automations.map((automation) => (
-        <div key={automation.id} className="card hover:shadow-lg transition-shadow duration-300">
-          <div className="mb-4 flex flex-wrap gap-2">
-            <span className="inline-block bg-primary-100 text-primary-800 text-sm font-medium px-3 py-1 rounded-full">
-              {automation.category}
-            </span>
-            <span className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${
-              automation.complexity === 'Beginner'
-                ? 'bg-green-100 text-green-800'
-                : automation.complexity === 'Intermediate'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {automation.complexity}
-            </span>
-            <span className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${
-              automation.status === 'Available'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-gray-100 text-gray-800'
-            }`}>
-              {automation.status}
-            </span>
-          </div>
-          
-          <h3 className="text-xl font-semibold mb-3 text-gray-900">
-            {automation.name}
-          </h3>
-          
-          <p className="text-gray-600 mb-4">
-            {automation.description}
-          </p>
-          
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              <span className="font-medium">Time Saved:</span> {automation.time_saved}
+      {displayTemplates.map((template) => {
+        // Get relevance score if this is a search result
+        const searchResult = searchQuery && searchResults.length > 0 
+          ? searchResults.find(result => result.template.id === template.id)
+          : null
+        
+        return (
+          <div key={template.id} className="card hover:shadow-lg transition-shadow duration-300">
+            <div className="mb-4 flex flex-wrap gap-2">
+              {template.score > 0 && (
+                <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+                  Score: {template.score}
+                </span>
+              )}
+              {searchResult && (
+                <span className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+                  Relevance: {Math.round(searchResult.relevance_score * 100)}%
+                </span>
+              )}
             </div>
-            <button 
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                automation.status === 'Available'
-                  ? 'bg-primary-600 text-white hover:bg-primary-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-              disabled={automation.status === 'Coming Soon'}
-            >
-              {automation.status === 'Available' ? 'Get Started' : 'Coming Soon'}
-            </button>
+            
+            <h3 className="text-xl font-semibold mb-3 text-gray-900">
+              {template.name}
+            </h3>
+            
+            <p className="text-gray-600 mb-4">
+              {template.description}
+            </p>
+            
+            <div className="flex items-center justify-end">
+              <a 
+                href={template.download_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-primary-600 text-white hover:bg-primary-700"
+              >
+                Download
+              </a>
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

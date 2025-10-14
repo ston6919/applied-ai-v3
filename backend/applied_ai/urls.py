@@ -16,7 +16,8 @@ def api_root(request):
             'tools': '/api/tools/',
             'automations': '/api/automations/',
             'mastermind': '/api/mastermind/',
-            'landing_pages': '/api/landing-pages/'
+            'landing_pages': '/api/landing-pages/',
+            'n8n_templates': '/api/n8n-templates/'
         }
     })
 
@@ -35,6 +36,7 @@ urlpatterns = [
     path('api/automations/', include('automations.urls')),
     path('api/mastermind/', include('mastermind.urls')),
     path('api/', include('landing_pages.urls')),
+    path('api/n8n-templates/', include('n8n_templates.urls')),
 ]
 
 if settings.DEBUG:
