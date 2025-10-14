@@ -45,7 +45,7 @@ export default function Navbar() {
             <div className={`hidden md:flex items-center gap-6 rounded-full px-5 py-2 transition-all duration-300 ${
               isScrolled 
                 ? 'shadow-sm border border-gray-200 backdrop-blur bg-white/70' 
-                : 'border border-gray-200/50 backdrop-blur-none bg-transparent'
+                : 'border border-gray-200/50 backdrop-blur-none bg-white/95'
             }`}>
               <Link href="/" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Home</Link>
               <Link href="/news" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">News</Link>

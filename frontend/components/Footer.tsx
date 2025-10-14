@@ -31,14 +31,17 @@ export default function Footer() {
           
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact</h4>
-            <p className="text-gray-400">
+            <p className="text-gray-400 mb-4">
               Get in touch with our team for AI solutions and support.
             </p>
+            <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+              Contact Us
+            </Link>
           </div>
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Applied AI. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Applied AI. All rights reserved.</p>
         </div>
       </div>
     </footer>

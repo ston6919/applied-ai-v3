@@ -135,3 +135,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # MailerLite Configuration
 MAILERLITE_API_KEY = config('MAILERLITE_API_KEY', default='')
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@applied-ai.com')

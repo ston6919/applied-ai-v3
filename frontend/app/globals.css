@@ -54,6 +54,9 @@ body {
     background-clip: text;
     color: transparent;
   }
+  .text-soft-shadow {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
   .btn-shimmer {
     position: relative;
     overflow: hidden;
@@ -70,19 +73,54 @@ body {
     transform: translateX(100%);
   }
 
-  /* Light theme hero backgrounds */
-  .hero-bg {
+  /* Light theme hero backgrounds - Rotating blobs */
+  .wave-svg {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
+    width: 100%;
     height: 100vh;
     z-index: -10;
-    background:
-      radial-gradient(1200px 600px at 50% 35%, rgba(99,102,241,0.10), transparent 60%),
-      radial-gradient(900px 450px at 50% 55%, rgba(236,72,153,0.08), transparent 60%),
-      radial-gradient(700px 350px at 50% 75%, rgba(245,158,11,0.07), transparent 60%),
-      linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  }
+
+  .white-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: -9;
+    pointer-events: none;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .out-top {
+    animation: rotate 22s linear infinite;
+    transform-origin: 13px 10px;
+  }
+  
+  .in-top {
+    animation: rotate 14s linear infinite;
+    transform-origin: 13px 10px;
+  }
+  
+  .out-bottom {
+    animation: rotate 20s linear infinite;
+    transform-origin: 84px 93px;
+  }
+  
+  .in-bottom {
+    animation: rotate 12s linear infinite;
+    transform-origin: 84px 93px;
   }
 
   /* Particle effect from banner */
@@ -178,16 +216,6 @@ body {
     }
   }
 
-  .hero-rings {
-    position: absolute;
-    inset: 0;
-    z-index: -10;
-    pointer-events: none;
-    background:
-      repeating-radial-gradient(ellipse at 50% 50%, rgba(15,23,42,0.05) 0px, rgba(15,23,42,0.05) 2px, transparent 2px, transparent 140px);
-    mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 85%);
-    -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 85%);
-  }
 }
 
 /* Floating color blobs */

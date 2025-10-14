@@ -6,25 +6,11 @@ export default function Home() {
     <div>
       {/* Hero: Applied AI for real business outcomes */}
       <section className="relative overflow-hidden pt-32 pb-16">
-        {/* Light theme background and subtle rings */}
-        <div className="hero-bg" />
-        <div className="hero-rings" />
-        
-        {/* Particle effect from banner */}
-        <div className="particle-container">
-          <div className="particle particle-1"></div>
-          <div className="particle particle-2"></div>
-          <div className="particle particle-3"></div>
-          <div className="particle particle-4"></div>
-          <div className="particle particle-5"></div>
-          <div className="particle particle-6"></div>
-          <div className="particle particle-7"></div>
-          <div className="particle particle-8"></div>
-        </div>
+        {/* Background moved to Root layout */}
 
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-extrabold mb-6 gradient-text">
+            <h1 className="text-5xl md:text-6xl font-extrabold mb-6 gradient-text text-soft-shadow">
               AI that drives results, not just looks smart
             </h1>
             <p className="text-xl md:text-2xl mb-6 text-gray-700">
