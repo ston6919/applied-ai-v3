@@ -21,7 +21,7 @@ function getOrCreateDeviceId(): string | undefined {
 export default function ChatKitWidget() {
   const { control } = useChatKit({
     api: {
-      async getClientSecret(existing?: string) {
+      async getClientSecret(existing: string | null) {
         // Optionally implement refresh based on `existing`
         const deviceId = getOrCreateDeviceId()
         const res = await fetch('/api/chatkit/session', {
