@@ -34,7 +34,8 @@ export default function AutomationsList({ searchQuery, searchTrigger, onSearchRe
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8010/api/n8n-templates/templates/')
+        const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
+        const response = await fetch(`${base}/api/n8n-templates/templates/`)
         if (!response.ok) {
           throw new Error('Failed to fetch templates')
         }
@@ -52,20 +53,16 @@ export default function AutomationsList({ searchQuery, searchTrigger, onSearchRe
   }, [])
 
   const performSearch = useCallback(async () => {
-    if (!searchQuery || searchQuery.trim() === '') {
-      setSearchResults([])
-      return
-    }
-
     setSearching(true)
     
     try {
-      const response = await fetch('http://127.0.0.1:8010/api/n8n-templates/templates/search/', {
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
+      const response = await fetch(`${base}/api/n8n-templates/templates/search/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: searchQuery }),
+        body: JSON.stringify({ query: searchQuery || '' }),
       })
 
       const data = await response.json()
