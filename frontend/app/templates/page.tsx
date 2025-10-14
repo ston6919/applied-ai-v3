@@ -5,7 +5,7 @@ import AutomationsList from '@/components/AutomationsList'
 
 export default function AutomationsPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState([])
+  const [searchResults, setSearchResults] = useState<any[]>([])
   const [searchTrigger, setSearchTrigger] = useState(0)
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
