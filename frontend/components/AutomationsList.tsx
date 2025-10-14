@@ -30,6 +30,9 @@ export default function AutomationsList({ searchQuery, searchTrigger, onSearchRe
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(true)
   const [searching, setSearching] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [nextPage, setNextPage] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(false)
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -41,6 +44,8 @@ export default function AutomationsList({ searchQuery, searchTrigger, onSearchRe
         }
         const data = await response.json()
         setTemplates(data.results || data)
+        setNextPage(data.next || null)
+        setHasMore(!!data.next)
       } catch (error) {
         console.error('Error fetching n8n templates:', error)
         setTemplates([])
@@ -51,6 +56,26 @@ export default function AutomationsList({ searchQuery, searchTrigger, onSearchRe
 
     fetchTemplates()
   }, [])
+
+  const loadMoreTemplates = async () => {
+    if (!nextPage || loadingMore) return
+
+    setLoadingMore(true)
+    try {
+      const response = await fetch(nextPage)
+      if (!response.ok) {
+        throw new Error('Failed to fetch more templates')
+      }
+      const data = await response.json()
+      setTemplates(prev => [...prev, ...(data.results || [])])
+      setNextPage(data.next || null)
+      setHasMore(!!data.next)
+    } catch (error) {
+      console.error('Error fetching more templates:', error)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const performSearch = useCallback(async () => {
     setSearching(true)
@@ -126,49 +151,74 @@ export default function AutomationsList({ searchQuery, searchTrigger, onSearchRe
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {displayTemplates.map((template) => {
-        // Get relevance score if this is a search result
-        const searchResult = searchQuery && searchResults.length > 0 
-          ? searchResults.find(result => result.template.id === template.id)
-          : null
-        
-        return (
-          <div key={template.id} className="card hover:shadow-lg transition-shadow duration-300">
-            <div className="mb-4 flex flex-wrap gap-2">
-              {template.score > 0 && (
-                <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
-                  Score: {template.score}
-                </span>
-              )}
-              {searchResult && (
-                <span className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                  Relevance: {Math.round(searchResult.relevance_score * 100)}%
-                </span>
-              )}
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {displayTemplates.map((template) => {
+          // Get relevance score if this is a search result
+          const searchResult = searchQuery && searchResults.length > 0 
+            ? searchResults.find(result => result.template.id === template.id)
+            : null
+          
+          return (
+            <div key={template.id} className="card hover:shadow-lg transition-shadow duration-300">
+              <div className="mb-4 flex flex-wrap gap-2">
+                {template.score > 0 && (
+                  <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+                    Score: {template.score}
+                  </span>
+                )}
+                {searchResult && (
+                  <span className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+                    Relevance: {Math.round(searchResult.relevance_score * 100)}%
+                  </span>
+                )}
+              </div>
+              
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                {template.name}
+              </h3>
+              
+              <p className="text-gray-600 mb-4">
+                {template.description}
+              </p>
+              
+              <div className="flex items-center justify-end">
+                <a 
+                  href={template.download_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-primary-600 text-white hover:bg-primary-700"
+                >
+                  Download
+                </a>
+              </div>
             </div>
-            
-            <h3 className="text-xl font-semibold mb-3 text-gray-900">
-              {template.name}
-            </h3>
-            
-            <p className="text-gray-600 mb-4">
-              {template.description}
-            </p>
-            
-            <div className="flex items-center justify-end">
-              <a 
-                href={template.download_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-primary-600 text-white hover:bg-primary-700"
-              >
-                Download
-              </a>
-            </div>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+      
+      {/* Load More button - only show when not searching and there are more templates */}
+      {!searchQuery && hasMore && (
+        <div className="flex justify-center mt-12">
+          <button
+            onClick={loadMoreTemplates}
+            disabled={loadingMore}
+            className="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {loadingMore ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Loading...
+              </span>
+            ) : (
+              'Load More Templates'
+            )}
+          </button>
+        </div>
+      )}
+    </>
   )
 }
