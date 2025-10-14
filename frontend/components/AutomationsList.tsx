@@ -21,10 +21,11 @@ interface SearchResult {
 
 interface AutomationsListProps {
   searchQuery?: string
+  searchTrigger?: number
   onSearchResults?: (results: SearchResult[]) => void
 }
 
-export default function AutomationsList({ searchQuery, onSearchResults }: AutomationsListProps) {
+export default function AutomationsList({ searchQuery, searchTrigger, onSearchResults }: AutomationsListProps) {
   const [templates, setTemplates] = useState<N8nTemplate[]>([])
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(true)
@@ -85,12 +86,12 @@ export default function AutomationsList({ searchQuery, onSearchResults }: Automa
     }
   }, [searchQuery, onSearchResults])
 
-  // Expose search function to parent component
+  // Trigger search when searchTrigger changes
   useEffect(() => {
-    if (onSearchResults) {
-      onSearchResults(performSearch)
+    if (searchTrigger !== undefined && searchTrigger > 0) {
+      performSearch()
     }
-  }, [onSearchResults, performSearch])
+  }, [searchTrigger, performSearch])
 
   if (loading) {
     return (

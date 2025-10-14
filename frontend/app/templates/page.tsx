@@ -6,24 +6,18 @@ import AutomationsList from '@/components/AutomationsList'
 export default function AutomationsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
-  const [searchFunction, setSearchFunction] = useState<(() => void) | null>(null)
+  const [searchTrigger, setSearchTrigger] = useState(0)
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
 
-  const handleSearchResults = useCallback((results: any[] | (() => void)) => {
-    if (Array.isArray(results)) {
-      setSearchResults(results)
-    } else {
-      setSearchFunction(() => results)
-    }
+  const handleSearchResults = useCallback((results: any[]) => {
+    setSearchResults(results)
   }, [])
 
   const triggerSearch = () => {
-    if (searchFunction) {
-      searchFunction()
-    }
+    setSearchTrigger(prev => prev + 1)
   }
 
   return (
@@ -76,6 +70,7 @@ export default function AutomationsPage() {
       </div>
       <AutomationsList 
         searchQuery={searchQuery} 
+        searchTrigger={searchTrigger}
         onSearchResults={handleSearchResults}
       />
     </div>
