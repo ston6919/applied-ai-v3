@@ -17,9 +17,6 @@ export default function Home() {
               We turn AI models and tools into measurable outcomes: more revenue, lower costs,
               faster operations. Learn what to use, when to use it, and how to implement it the
               right way in your business.
-              <br />
-              <br />
-              AI without the BS and hype.
             </p>
           </div>
         </div>
