@@ -161,7 +161,8 @@ def create_presigned_put(request):
         public_url = None
         if acl == 'public-read':
             if cdn_base:
-                public_url = f"{cdn_base.rstrip('/')}/{object_key}"
+                # CDN URL includes bucket in path: https://cdn.example.com/bucket-name/file.jpg
+                public_url = f"{cdn_base.rstrip('/')}/{bucket}/{object_key}"
             else:
                 region = config('SPACES_REGION')
                 bucket_host = f"https://{bucket}.{region}.digitaloceanspaces.com"
@@ -255,7 +256,8 @@ def upload_file(request):
         if acl == 'public-read':
             cdn_base = config('SPACES_CDN_BASE', default='')
             if cdn_base:
-                public_url = f"{cdn_base.rstrip('/')}/{filename}"
+                # CDN URL includes bucket in path: https://cdn.example.com/bucket-name/file.jpg
+                public_url = f"{cdn_base.rstrip('/')}/{bucket}/{filename}"
             else:
                 region = config('SPACES_REGION')
                 bucket_host = f"https://{bucket}.{region}.digitaloceanspaces.com"
