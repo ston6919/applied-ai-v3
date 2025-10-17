@@ -139,3 +139,7 @@ MAILERLITE_API_KEY = config('MAILERLITE_API_KEY', default='')
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@applied-ai.com')
+
+# File Upload Settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB in bytes
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB in bytes

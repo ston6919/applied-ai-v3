@@ -6,7 +6,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
-from .storage_views import create_presigned_put
+from .storage_views import create_presigned_put, upload_file
 
 def api_root(request):
     return JsonResponse({
@@ -39,6 +39,7 @@ urlpatterns = [
     path('api/', include('landing_pages.urls')),
     path('api/n8n-templates/', include('n8n_templates.urls')),
     path('api/storage/presign', create_presigned_put, name='storage_presign'),
+    path('api/storage/upload', upload_file, name='storage_upload'),
 ]
 
 if settings.DEBUG:
