@@ -225,6 +225,10 @@ def upload_file(request):
         # Sanitize filename to prevent path traversal and other security issues
         filename = _sanitize_filename(filename)
         
+        # Add folder prefix for organization
+        folder_prefix = 'api-uploads/'
+        full_key = f"{folder_prefix}{filename}"
+        
         # Get ACL setting (default to public-read)
         acl = request.POST.get('acl', 'public-read')
         
@@ -245,7 +249,7 @@ def upload_file(request):
         # For files uploaded via Django, we can use the file object directly
         s3.put_object(
             Bucket=bucket,
-            Key=filename,
+            Key=full_key,
             Body=file_obj,
             ContentType=content_type,
             ACL=acl
@@ -256,12 +260,12 @@ def upload_file(request):
         if acl == 'public-read':
             cdn_base = config('SPACES_CDN_BASE', default='')
             if cdn_base:
-                # CDN URL includes bucket in path: https://cdn.example.com/bucket-name/file.jpg
-                public_url = f"{cdn_base.rstrip('/')}/{bucket}/{filename}"
+                # CDN URL includes bucket in path: https://cdn.example.com/bucket-name/folder/file.jpg
+                public_url = f"{cdn_base.rstrip('/')}/{bucket}/{full_key}"
             else:
                 region = config('SPACES_REGION')
                 bucket_host = f"https://{bucket}.{region}.digitaloceanspaces.com"
-                public_url = f"{bucket_host}/{filename}"
+                public_url = f"{bucket_host}/{full_key}"
         
         return JsonResponse({
             'success': True,
