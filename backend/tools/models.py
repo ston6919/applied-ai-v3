@@ -22,8 +22,8 @@ class Tool(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    features = models.JSONField(default=list, blank=True)  # Array of strings
-    new_features = models.JSONField(default=list, blank=True)  # Array of strings for new features
+    features = models.JSONField(default=list, blank=True, null=True)  # Array of strings
+    new_features = models.JSONField(default=list, blank=True, null=True)  # Array of strings for new features
     website_url = models.URLField(verbose_name='Website URL', blank=True, default='')
     source_url = models.URLField(blank=True, null=True, verbose_name='Source URL')
     image_url = models.URLField(blank=True, null=True, verbose_name='Image URL')
