@@ -13,7 +13,7 @@ class ToolSearchService:
         self.openai_client = OpenAI(api_key=config('OPENAI_API_KEY'))
         
         # Pinecone HTTP API settings
-        self.pinecone_url = 'https://ai-tools-18pj5g5.svc.aped-4627-b74a.pinecone.io/query'
+        self.pinecone_url = 'https://ai-tools-live-18pj5g5.svc.aped-4627-b74a.pinecone.io/query'
         self.pinecone_api_key = config('PINECONE_API_KEY')
         
     def get_embedding(self, text: str) -> tuple[List[float], Dict[str, Any]]:
