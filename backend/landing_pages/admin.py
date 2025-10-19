@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.urls import path
 from django.shortcuts import render
 from django.contrib import messages
-from .models import LandingPage
+from .models import LandingPage, WaitingListSubmission
 from .widgets import MailerLiteGroupSelectWidget, MailerLiteGroupMultiSelectWidget
 from .mailerlite_service import MailerLiteService
 from .forms import LandingPageForm
@@ -76,4 +76,13 @@ class LandingPageAdmin(admin.ModelAdmin):
             messages.error(request, f'Error refreshing groups: {str(e)}')
             logger.error(f"Admin refresh groups error: {error_details}")
             return JsonResponse({'status': 'error', 'message': str(e)})
+
+
+@admin.register(WaitingListSubmission)
+class WaitingListSubmissionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'business_name', 'budget', 'mailerlite_subscribed', 'created_at']
+    list_filter = ['mailerlite_subscribed', 'budget', 'created_at']
+    search_fields = ['name', 'email', 'business_name']
+    readonly_fields = ['created_at']
+    ordering = ['-created_at']
 

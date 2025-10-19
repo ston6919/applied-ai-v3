@@ -143,3 +143,86 @@ def submit_landing_page_step(request, slug):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def waiting_list_submit(request):
+    """Handle waiting list form submission - save to database and add to MailerLite"""
+    try:
+        data = request.data
+        
+        # Validate required fields
+        required_fields = ['name', 'email', 'business_name', 'project_nature', 'budget']
+        for field in required_fields:
+            if not data.get(field):
+                return Response(
+                    {'error': f'{field.replace("_", " ").title()} is required'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        name = data.get('name')
+        email = data.get('email')
+        business_name = data.get('business_name')
+        project_nature = data.get('project_nature')
+        budget = data.get('budget')
+        
+        # MailerLite group ID for waiting list
+        WAITING_LIST_GROUP_ID = '168656954990790121'
+        mailerlite_subscribed = False
+        
+        # Add to MailerLite
+        try:
+            mailerlite_service = MailerLiteService()
+            
+            # Check if subscriber already exists
+            existing_subscriber = mailerlite_service.get_subscriber(email)
+            
+            if existing_subscriber:
+                # Add to waiting list group
+                mailerlite_service.add_subscriber_to_group(email, WAITING_LIST_GROUP_ID)
+                # Update their name if provided
+                mailerlite_service.update_subscriber(email, first_name=name)
+                mailerlite_subscribed = True
+                logger.info(f"Added existing subscriber {email} to waiting list group")
+            else:
+                # Create new subscriber with name and add to waiting list group
+                result = mailerlite_service.create_subscriber(
+                    email, 
+                    WAITING_LIST_GROUP_ID,
+                    first_name=name
+                )
+                if result:
+                    mailerlite_subscribed = True
+                    logger.info(f"Created new subscriber {email} and added to waiting list group")
+                else:
+                    logger.error(f"Failed to create MailerLite subscriber for {email}")
+                    
+        except Exception as e:
+            logger.error(f"MailerLite error for {email}: {str(e)}")
+            # Continue even if MailerLite fails - we still save to database
+        
+        # Save to database
+        from .models import WaitingListSubmission
+        submission = WaitingListSubmission.objects.create(
+            name=name,
+            email=email,
+            business_name=business_name,
+            project_nature=project_nature,
+            budget=budget,
+            mailerlite_subscribed=mailerlite_subscribed
+        )
+        
+        return Response({
+            'success': True,
+            'message': 'Successfully added to waiting list',
+            'submission_id': submission.id,
+            'mailerlite_subscribed': mailerlite_subscribed
+        })
+        
+    except Exception as e:
+        logger.error(f"Error processing waiting list submission: {str(e)}")
+        return Response(
+            {'error': 'An error occurred processing your submission'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+

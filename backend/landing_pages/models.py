@@ -18,3 +18,19 @@ class LandingPage(models.Model):
     def __str__(self):
         return self.title
 
+
+class WaitingListSubmission(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    business_name = models.CharField(max_length=200)
+    project_nature = models.TextField()
+    budget = models.CharField(max_length=50)
+    mailerlite_subscribed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} - {self.business_name}"
+
