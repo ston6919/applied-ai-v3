@@ -61,7 +61,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class ToolAdmin(admin.ModelAdmin):
     list_display = ['name', 'pricing', 'is_featured', 'show_on_site', 'date_added']
     list_filter = ['pricing', 'is_featured', 'show_on_site', 'categories']
-    search_fields = ['name', 'description', 'external_id']
+    search_fields = ['name', 'short_description', 'description', 'external_id']
     filter_horizontal = ['categories']
     ordering = ['-created_at', 'name']
     # Allow manual editing of image_url
@@ -159,7 +159,7 @@ class ToolAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'description', 'features', 'new_features')
+            'fields': ('name', 'short_description', 'description', 'features', 'new_features')
         }),
         ('Image', {
             'fields': ('image_file', 'image_url'),

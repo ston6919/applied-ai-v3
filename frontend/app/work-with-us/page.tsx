@@ -79,6 +79,12 @@ export default function WorkWithUs() {
                 Join our waiting list and be the first to know when we're ready to take on new projects. 
                 We'll reach out when we have capacity and your project aligns with our expertise.
               </p>
+              <p className="text-base text-gray-600">
+                If you want to feature your tool with us or sponsor our content, please visit our{' '}
+                <a href="/contact" className="text-primary-600 hover:text-primary-700 font-medium underline">
+                  contact page
+                </a>.
+              </p>
             </div>
           </div>
         </div>

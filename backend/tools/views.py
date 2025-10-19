@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Tool
 from .serializers import ToolSerializer
+from .search_service import ToolSearchService
 from decouple import config
 import boto3
 from botocore.client import Config as BotoConfig
@@ -42,6 +43,103 @@ class ToolViewSet(viewsets.ReadOnlyModelViewSet):
             return f"{cdn_base.rstrip('/')}/{key}"
         region = config('SPACES_REGION')
         return f"https://{bucket}.{region}.digitaloceanspaces.com/{key}"
+
+    @action(detail=False, methods=['post'])
+    def search(self, request):
+        """RAG-based search using OpenAI embeddings and Pinecone, or return all tools if query is empty"""
+        query = request.data.get('query', '').strip()
+        print(f"[Tools Search] Received search request with query: '{query}'")
+        
+        # If query is empty, return all tools
+        if not query:
+            print("[Tools Search] Empty query - returning all tools")
+            tools = Tool.objects.filter(show_on_site=True).order_by('-created_at', 'name')
+            results = []
+            for tool in tools:
+                serializer = self.get_serializer(tool)
+                results.append({
+                    'tool': serializer.data,
+                    'relevance_score': None,  # No relevance score for non-search results
+                    'metadata': {}
+                })
+            
+            return Response({
+                'query': '',
+                'results': results,
+                'total': len(results),
+                'debug': {'message': 'Returned all tools (no search query provided)'}
+            })
+        
+        debug_info = {}
+        try:
+            print("[Tools Search] Initializing ToolSearchService")
+            search_service = ToolSearchService()
+            
+            # Get embedding first (this will populate debug_info even if Pinecone fails)
+            print("[Tools Search] Getting embedding from OpenAI")
+            query_embedding, openai_debug = search_service.get_embedding(query)
+            debug_info.update(openai_debug)
+            print(f"[Tools Search] Embedding generated, length: {len(query_embedding)}")
+            print(f"[Tools Search] Embedding vector (first 10): {query_embedding[:10]}")
+            print(f"[Tools Search] Embedding vector (last 10): {query_embedding[-10:]}")
+            
+            # Now do the Pinecone search
+            print("[Tools Search] Querying Pinecone")
+            search_results, full_debug_info = search_service.search_tools(query, top_k=10)
+            debug_info = full_debug_info  # Replace with full debug info if successful
+            print(f"[Tools Search] Pinecone returned {len(search_results)} results")
+            
+            # Get external IDs from search results
+            external_ids = [result['external_id'] for result in search_results]
+            print(f"[Tools Search] External IDs from Pinecone: {external_ids}")
+
+            # Fetch tools from database using the external_id from Pinecone
+            tools = Tool.objects.filter(
+                external_id__in=external_ids,
+                show_on_site=True
+            )
+            print(f"[Tools Search] Found {tools.count()} tools in database matching external IDs")
+
+            # Create a mapping of external_id to tool
+            tool_map = {str(tool.external_id): tool for tool in tools}
+            print(f"[Tools Search] Tool map keys: {list(tool_map.keys())}")
+
+            # Order results by search score from Pinecone
+            ordered_results = []
+            for result in search_results:
+                external_id = str(result['external_id'])  # Ensure string comparison
+                if external_id in tool_map:
+                    tool = tool_map[external_id]
+                    serializer = self.get_serializer(tool)
+                    ordered_results.append({
+                        'tool': serializer.data,
+                        'relevance_score': result['score'],
+                        'metadata': result.get('metadata', {})
+                    })
+                    print(f"[Tools Search] Added tool: {tool.name} (score: {result['score']})")
+                else:
+                    print(f"[Tools Search] ⚠️ Warning: External ID {external_id} from Pinecone not found in database")
+
+            print(f"[Tools Search] ✅ Returning {len(ordered_results)} ordered results")
+            return Response({
+                'query': query,
+                'results': ordered_results,
+                'total': len(ordered_results),
+                'debug': debug_info
+            })
+            
+        except Exception as e:
+            print(f"[Tools Search] ❌ ERROR: {str(e)}")
+            print(f"[Tools Search] Exception type: {type(e).__name__}")
+            import traceback
+            print(f"[Tools Search] Traceback:\n{traceback.format_exc()}")
+            return Response(
+                {
+                    'error': f'Search failed: {str(e)}',
+                    'debug': debug_info  # Return whatever debug info we collected before the error
+                }, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=['post'], url_path='upload-image')
     def upload_image(self, request, pk=None):
