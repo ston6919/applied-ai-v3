@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div>
       {/* Hero: Applied AI for real business outcomes */}
-      <section className="relative overflow-hidden pt-32">
+      <section className="relative overflow-hidden pt-16 md:pt-32">
         {/* Background moved to Root layout */}
 
         <div className="container mx-auto px-4">

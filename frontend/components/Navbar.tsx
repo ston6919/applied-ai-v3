@@ -85,11 +85,11 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <div className="flex flex-col space-y-4">
-              <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors">Home</Link>
-              <Link href="/news" className="text-gray-700 hover:text-primary-600 transition-colors">News</Link>
-              <Link href="/tools" className="text-gray-700 hover:text-primary-600 transition-colors">Tools</Link>
-              <Link href="/templates" className="text-gray-700 hover:text-primary-600 transition-colors">Templates</Link>
-              <Link href="/work-with-us" className="text-gray-700 hover:text-primary-600 transition-colors">Work With Us</Link>
+              <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Home</Link>
+              <Link href="/news" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>News</Link>
+              <Link href="/tools" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Tools</Link>
+              <Link href="/templates" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Templates</Link>
+              <Link href="/work-with-us" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Work With Us</Link>
               <a
                 href="https://www.skool.com/applied-ai-mastermind-9612"
                 target="_blank"
