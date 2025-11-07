@@ -3,6 +3,7 @@ from django import forms
 from .models import Tool, Category
 from decouple import config
 from urllib.parse import quote
+from adminsortable2.admin import SortableAdminMixin
 class PreviewFileInput(forms.ClearableFileInput):
     def render(self, name, value, attrs=None, renderer=None):
         input_html = super().render(name, value, attrs=attrs, renderer=renderer)
@@ -58,12 +59,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(Tool)
-class ToolAdmin(admin.ModelAdmin):
+class ToolAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ['name', 'pricing', 'is_featured', 'show_on_site', 'date_added']
     list_filter = ['pricing', 'is_featured', 'show_on_site', 'categories']
     search_fields = ['name', 'short_description', 'description', 'external_id']
     filter_horizontal = ['categories']
-    ordering = ['-created_at', 'name']
+    ordering = ['table_order', '-created_at', 'name']
     # Allow manual editing of image_url
 
     class ToolAdminForm(forms.ModelForm):
@@ -166,7 +167,7 @@ class ToolAdmin(admin.ModelAdmin):
             'description': 'Upload an image file to store in Spaces. image_url will be set automatically.'
         }),
         ('URLs', {
-            'fields': ('website_url', 'source_url')
+            'fields': ('website_url', 'affiliate_url', 'source_url')
         }),
         ('Settings', {
             'fields': ('pricing', 'is_featured', 'show_on_site', 'external_id', 'date_added', 'last_updated')

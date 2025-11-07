@@ -17,6 +17,7 @@ interface Tool {
   features: string[]
   new_features: string[]
   website_url: string
+  affiliate_url?: string
   source_url?: string
   image_url?: string
   external_id?: string
@@ -144,7 +145,7 @@ export default function ToolDetailPage({ params }: { params: { id: string } }) {
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4">
             <a 
-              href={tool.website_url} 
+              href={tool.affiliate_url || tool.website_url} 
               target="_blank" 
               rel="noopener noreferrer"
               className="btn-primary inline-block"
@@ -262,7 +263,7 @@ export default function ToolDetailPage({ params }: { params: { id: string } }) {
               Visit their website to learn more and get started.
             </p>
             <a 
-              href={tool.website_url} 
+              href={tool.affiliate_url || tool.website_url} 
               target="_blank" 
               rel="noopener noreferrer"
               className="btn-secondary inline-block w-full text-center bg-white text-primary-600 hover:bg-gray-100"

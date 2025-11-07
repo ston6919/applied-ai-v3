@@ -12,14 +12,26 @@ from datetime import datetime
 import os
 
 
-class ToolViewSet(viewsets.ReadOnlyModelViewSet):
+class ToolViewSet(viewsets.ModelViewSet):
     queryset = Tool.objects.filter(show_on_site=True)
     serializer_class = ToolSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['pricing', 'is_featured', 'categories', 'show_on_site']
     search_fields = ['name', 'description', 'external_id']
-    ordering_fields = ['name', 'created_at']
     ordering = ['-created_at', 'name']
+    
+    def filter_queryset(self, queryset):
+        """Override to handle manual ordering"""
+        # Check if manual ordering is requested (for table view)
+        ordering_param = self.request.query_params.get('ordering', '')
+        if ordering_param == 'manual':
+            # Apply filters but not ordering
+            queryset = super().filter_queryset(queryset)
+            # Then apply manual ordering
+            return queryset.order_by('table_order', 'name')
+        
+        # Default behavior with standard filters and ordering
+        return super().filter_queryset(queryset)
 
     def _get_s3_client(self):
         endpoint_url = config('SPACES_ENDPOINT')
@@ -138,6 +150,61 @@ class ToolViewSet(viewsets.ReadOnlyModelViewSet):
                     'error': f'Search failed: {str(e)}',
                     'debug': debug_info  # Return whatever debug info we collected before the error
                 }, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['post'], url_path='reorder')
+    def reorder(self, request, pk=None):
+        """
+        Reorder a tool to a new position.
+        Expects: {"new_position": <int>}
+        """
+        try:
+            tool = Tool.objects.get(pk=pk)
+            new_position = request.data.get('new_position')
+            
+            if new_position is None:
+                return Response(
+                    {'error': 'new_position is required'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            new_position = int(new_position)
+            old_position = tool.table_order
+            
+            # Get all tools ordered by table_order
+            tools = list(Tool.objects.all().order_by('table_order', 'id'))
+            
+            # Remove the tool from its current position
+            tools = [t for t in tools if t.id != tool.id]
+            
+            # Insert at new position
+            tools.insert(new_position, tool)
+            
+            # Update table_order for all tools
+            for idx, t in enumerate(tools):
+                t.table_order = idx
+                t.save(update_fields=['table_order'])
+            
+            return Response({
+                'message': f'Tool "{tool.name}" moved to position {new_position}',
+                'old_position': old_position,
+                'new_position': new_position
+            })
+            
+        except Tool.DoesNotExist:
+            return Response(
+                {'error': 'Tool not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except ValueError:
+            return Response(
+                {'error': 'new_position must be an integer'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
