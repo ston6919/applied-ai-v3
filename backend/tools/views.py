@@ -2,6 +2,8 @@ from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models.functions import Coalesce
+from django.db.models import F, DateTimeField
 from .models import Tool
 from .serializers import ToolSerializer
 from .search_service import ToolSearchService
@@ -15,20 +17,30 @@ import os
 class ToolViewSet(viewsets.ModelViewSet):
     queryset = Tool.objects.filter(show_on_site=True)
     serializer_class = ToolSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['pricing', 'is_featured', 'categories', 'show_on_site']
     search_fields = ['name', 'description', 'external_id']
+    ordering_fields = ['updated_at', 'created_at', 'name', 'table_order']
     ordering = ['-created_at', 'name']
     
     def filter_queryset(self, queryset):
-        """Override to handle manual ordering"""
+        """Override to handle manual ordering and combined date sorting"""
         # Check if manual ordering is requested (for table view)
         ordering_param = self.request.query_params.get('ordering', '')
+        
         if ordering_param == 'manual':
             # Apply filters but not ordering
             queryset = super().filter_queryset(queryset)
             # Then apply manual ordering
             return queryset.order_by('table_order', 'name')
+        
+        elif ordering_param == '-updated_at':
+            # Apply filters first
+            queryset = super().filter_queryset(queryset)
+            # Sort by last_updated if set, otherwise by updated_at (most recent first)
+            return queryset.annotate(
+                effective_date=Coalesce('last_updated', 'updated_at', output_field=DateTimeField())
+            ).order_by('-effective_date', 'name')
         
         # Default behavior with standard filters and ordering
         return super().filter_queryset(queryset)
