@@ -68,6 +68,7 @@ export default function ToolsList({
   const [categories, setCategories] = useState<string[]>(['All'])
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [sortByUpdated, setSortByUpdated] = useState<'manual' | 'recent'>('manual')
   const observerTarget = useRef<HTMLDivElement>(null)
 
   const fetchTools = useCallback(async (page: number, reset: boolean = false) => {
@@ -80,10 +81,13 @@ export default function ToolsList({
 
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
       
-      // Use manual ordering for table view when not searching
-      const orderingParam = viewMode === 'table' && (!searchQuery || searchQuery.trim() === '') 
-        ? '&ordering=manual' 
-        : ''
+      // Use manual ordering or updated sort for table view when not searching
+      let orderingParam = ''
+      if (viewMode === 'table' && (!searchQuery || searchQuery.trim() === '')) {
+        orderingParam = sortByUpdated === 'recent' 
+          ? '&ordering=-updated_at' 
+          : '&ordering=manual'
+      }
       
       const response = await fetch(`${base}/api/tools/?page=${page}${orderingParam}`)
       
@@ -117,13 +121,21 @@ export default function ToolsList({
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [viewMode, searchQuery])
+  }, [viewMode, searchQuery, sortByUpdated])
 
-  // Initial load and reload when viewMode changes
+  // Initial load and reload when viewMode or sort changes
   useEffect(() => {
     fetchTools(1, true)
     setCurrentPage(1)
   }, [fetchTools])
+  
+  // Refetch when sort order changes
+  useEffect(() => {
+    if (viewMode === 'table') {
+      fetchTools(1, true)
+      setCurrentPage(1)
+    }
+  }, [sortByUpdated, viewMode, fetchTools])
 
   const performSearch = useCallback(async () => {
     
@@ -220,9 +232,11 @@ export default function ToolsList({
     ? displayTools 
     : displayTools.filter(tool => tool.categories.some(cat => cat.name === selectedCategory))
   ).sort((a, b) => {
-    // Featured tools first
-    if (a.is_featured && !b.is_featured) return -1
-    if (!a.is_featured && b.is_featured) return 1
+    // Only prioritize featured tools in card view, not in table view
+    if (viewMode === 'cards') {
+      if (a.is_featured && !b.is_featured) return -1
+      if (!a.is_featured && b.is_featured) return 1
+    }
     return 0
   })
 
@@ -353,8 +367,22 @@ export default function ToolsList({
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Updated
+              <th 
+                scope="col" 
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => setSortByUpdated(sortByUpdated === 'recent' ? 'manual' : 'recent')}
+              >
+                <div className="flex items-center gap-1">
+                  Updated
+                  <svg 
+                    className={`w-4 h-4 transition-transform ${sortByUpdated === 'recent' ? '' : 'rotate-180 opacity-50'}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Description
