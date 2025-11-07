@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Category {
   id: number
@@ -16,6 +17,7 @@ interface Tool {
   features: string[]
   new_features: string[]
   website_url: string
+  affiliate_url?: string
   source_url?: string
   image_url?: string
   external_id?: string
@@ -39,9 +41,24 @@ interface ToolsListProps {
   searchQuery?: string
   searchTrigger?: number
   onSearchResults?: (results: SearchResult[]) => void
+  viewMode: 'cards' | 'table'
+  setViewMode: (mode: 'cards' | 'table') => void
+  onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onSearchTrigger: () => void
+  searchResultsCount: number
 }
 
-export default function ToolsList({ searchQuery, searchTrigger, onSearchResults }: ToolsListProps) {
+export default function ToolsList({ 
+  searchQuery, 
+  searchTrigger, 
+  onSearchResults, 
+  viewMode, 
+  setViewMode,
+  onSearchChange,
+  onSearchTrigger,
+  searchResultsCount
+}: ToolsListProps) {
+  const router = useRouter()
   const [tools, setTools] = useState<Tool[]>([])
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,7 +79,13 @@ export default function ToolsList({ searchQuery, searchTrigger, onSearchResults 
       }
 
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
-      const response = await fetch(`${base}/api/tools/?page=${page}`)
+      
+      // Use manual ordering for table view when not searching
+      const orderingParam = viewMode === 'table' && (!searchQuery || searchQuery.trim() === '') 
+        ? '&ordering=manual' 
+        : ''
+      
+      const response = await fetch(`${base}/api/tools/?page=${page}${orderingParam}`)
       
       if (!response.ok) {
         throw new Error('Failed to fetch tools')
@@ -94,11 +117,12 @@ export default function ToolsList({ searchQuery, searchTrigger, onSearchResults 
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [])
+  }, [viewMode, searchQuery])
 
-  // Initial load
+  // Initial load and reload when viewMode changes
   useEffect(() => {
     fetchTools(1, true)
+    setCurrentPage(1)
   }, [fetchTools])
 
   const performSearch = useCallback(async () => {
@@ -235,8 +259,11 @@ export default function ToolsList({ searchQuery, searchTrigger, onSearchResults 
 
   return (
     <div>
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2 mb-8 justify-center">
+      {/* Category Filter and View Toggle */}
+      <div className="mb-5">
+        {/* Category Filter - Only show in card view */}
+        {viewMode === 'cards' && (
+          <div className="flex flex-wrap gap-2 justify-center mb-4">
         {categories.map((category) => (
           <button
             key={category}
@@ -251,8 +278,184 @@ export default function ToolsList({ searchQuery, searchTrigger, onSearchResults 
           </button>
         ))}
       </div>
+        )}
+        
+        {/* Search Bar and View Toggle */}
+        <div className="flex items-center justify-end gap-3">
+          {/* Compact Search Bar - Only show in table view */}
+          {viewMode === 'table' && (
+            <div className="w-64">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search tools..."
+                  value={searchQuery}
+                  onChange={onSearchChange}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      onSearchTrigger()
+                    }
+                  }}
+                  className="w-full px-3 py-2 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+              {searchQuery && searchResultsCount > 0 && (
+                <div className="mt-1 text-xs text-gray-600 text-right">
+                  Found {searchResultsCount} tool{searchResultsCount === 1 ? '' : 's'}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* View Mode Toggle */}
+          <div className="inline-flex rounded-lg border border-gray-300 bg-white p-1">
+            <button
+              onClick={() => setViewMode('table')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              title="Table View"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'cards'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              title="Card View"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
 
-      {/* Tools Grid */}
+      {/* Table View */}
+      {viewMode === 'table' && (
+        <div className="overflow-x-auto bg-white rounded-lg shadow">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Updated
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Description
+              </th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredTools.map((tool) => {
+                // Get relevance score if this is a search result
+                const searchResult = searchQuery && searchResults.length > 0 
+                  ? searchResults.find(result => result.tool.id === tool.id)
+                  : null
+                
+                return (
+                  <tr 
+                    key={tool.id} 
+                    onClick={() => router.push(`/tools/${tool.id}`)}
+                    className="hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
+                    {/* Name Column */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <div className="text-sm font-semibold text-gray-900">
+                          {tool.name}
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {searchResult && (
+                            <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">
+                              {Math.round(searchResult.relevance_score * 100)}%
+                            </span>
+                          )}
+                          {tool.categories.length > 0 && (
+                            <span className="inline-block bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded">
+                              {tool.categories[0].name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    
+                    {/* Updated Column */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-600">
+                        {tool.last_updated 
+                          ? new Date(tool.last_updated).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric', 
+                              year: '2-digit' 
+                            }).replace(',', '')
+                          : tool.updated_at 
+                            ? new Date(tool.updated_at).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: '2-digit' 
+                              }).replace(',', '')
+                            : '-'
+                        }
+                      </div>
+                    </td>
+                    
+                    {/* Description Column (Largest) */}
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-600 max-w-2xl">
+                        {tool.short_description}
+                      </div>
+                    </td>
+                    
+                    {/* Actions Column */}
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="flex gap-2 justify-end">
+                        <Link 
+                          href={`/tools/${tool.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center px-3 py-2 border border-primary-600 text-sm font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 transition-colors"
+                        >
+                          See More
+                        </Link>
+                        <a 
+                          href={tool.affiliate_url || tool.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+                        >
+                          Try Now
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Card View */}
+      {viewMode === 'cards' && (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredTools.map((tool) => {
           // Get relevance score if this is a search result
@@ -337,6 +540,7 @@ export default function ToolsList({ searchQuery, searchTrigger, onSearchResults 
           )
         })}
       </div>
+      )}
 
       {/* Loading More Indicator */}
       {loadingMore && (
