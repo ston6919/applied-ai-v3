@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import Coalesce
-from django.db.models import F, DateTimeField
+from django.db.models import F, DateTimeField, Max
 from .models import Tool
 from .serializers import ToolSerializer
 from .search_service import ToolSearchService
@@ -12,6 +12,40 @@ import boto3
 from botocore.client import Config as BotoConfig
 from datetime import datetime
 import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def _check_authorization(request):
+    """
+    Check if the request has a valid Bearer token.
+    Returns (is_authorized, error_message)
+    """
+    auth_header = request.headers.get('Authorization', '')
+    
+    if not auth_header:
+        return False, 'Authorization header required'
+    
+    # Check if it starts with "Bearer "
+    if not auth_header.startswith('Bearer '):
+        return False, 'Invalid authorization format. Use: Bearer {token}'
+    
+    # Extract the token
+    token = auth_header[7:]  # Remove "Bearer " prefix
+    
+    # Get the expected token from environment
+    expected_token = config('TOOLS_API_TOKEN', default='')
+    
+    if not expected_token:
+        logger.error('TOOLS_API_TOKEN not configured in environment')
+        return False, 'Server configuration error'
+    
+    # Compare tokens
+    if token != expected_token:
+        return False, 'Invalid authorization token'
+    
+    return True, None
 
 
 class ToolViewSet(viewsets.ModelViewSet):
@@ -22,6 +56,30 @@ class ToolViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description', 'external_id']
     ordering_fields = ['updated_at', 'created_at', 'name', 'table_order']
     ordering = ['-created_at', 'name']
+    
+    def create(self, request, *args, **kwargs):
+        """Override create to require bearer token and automatically assign table_order at the bottom of the list"""
+        # Check authorization
+        is_authorized, auth_error = _check_authorization(request)
+        if not is_authorized:
+            return Response({'error': auth_error}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Get the highest table_order value
+        highest_order = Tool.objects.aggregate(
+            max_order=Max('table_order')
+        )['max_order'] or -1
+        
+        # Set table_order to be one more than the highest (puts it at the bottom)
+        # Handle both QueryDict and regular dict
+        if hasattr(request.data, '_mutable'):
+            request.data._mutable = True
+            request.data['table_order'] = highest_order + 1
+            request.data._mutable = False
+        else:
+            # For regular dict (e.g., JSON requests)
+            request.data['table_order'] = highest_order + 1
+        
+        return super().create(request, *args, **kwargs)
     
     def filter_queryset(self, queryset):
         """Override to handle manual ordering and combined date sorting"""

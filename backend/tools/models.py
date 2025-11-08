@@ -31,7 +31,7 @@ class Tool(models.Model):
     image_url = models.URLField(blank=True, null=True, verbose_name='Image URL')
     external_id = models.IntegerField(blank=True, null=True, db_index=True)
     show_on_site = models.BooleanField(default=True)
-    pricing = models.CharField(max_length=20, choices=PRICING_CHOICES)
+    pricing = models.CharField(max_length=20, choices=PRICING_CHOICES, default='free', blank=True)
     is_featured = models.BooleanField(default=False)
     date_added = models.DateField(null=True, blank=True)
     last_updated = models.DateField(null=True, blank=True, verbose_name='Last Updated (Manual)')
