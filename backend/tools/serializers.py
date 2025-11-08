@@ -13,6 +13,8 @@ class ToolSerializer(serializers.ModelSerializer):
     category_ids = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Category.objects.all(), write_only=True, required=False, source='categories'
     )
+    affiliate_url = serializers.URLField(required=False, allow_blank=True)
+    pricing = serializers.ChoiceField(choices=Tool.PRICING_CHOICES, required=False)
 
     class Meta:
         model = Tool
