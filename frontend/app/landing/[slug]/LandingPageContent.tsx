@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 
@@ -20,12 +20,14 @@ interface SubmissionData {
   business_type: string
 }
 
-export default function LandingPageContent() {
+interface LandingPageContentProps {
+  initialData: LandingPageData
+}
+
+export default function LandingPageContent({ initialData }: LandingPageContentProps) {
   const params = useParams()
   const slug = params.slug as string
-  const [landingPage, setLandingPage] = useState<LandingPageData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [landingPage] = useState<LandingPageData>(initialData)
   const [currentStep, setCurrentStep] = useState<'email' | 'name' | 'business_type' | 'complete'>('email')
   const [formData, setFormData] = useState<SubmissionData>({
     email: '',
@@ -35,28 +37,6 @@ export default function LandingPageContent() {
   const [submitting, setSubmitting] = useState(false)
   const [submittingButton, setSubmittingButton] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (slug) {
-      fetchLandingPage()
-    }
-  }, [slug])
-
-  const fetchLandingPage = async () => {
-    try {
-      const base = process.env.NEXT_PUBLIC_API_URL || ''
-      const response = await fetch(`${base}/api/landing-pages/${slug}/`)
-      if (!response.ok) {
-        throw new Error('Landing page not found')
-      }
-      const data = await response.json()
-      setLandingPage(data)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleSubmit = async (step: string, data: Partial<SubmissionData>, buttonId?: string) => {
     setSubmitting(true)
@@ -119,24 +99,6 @@ export default function LandingPageContent() {
     if (formData.business_type) {
       handleSubmit('business_type', { business_type: formData.business_type })
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
-      </div>
-    )
-  }
-
-  if (error || !landingPage) {
-    return (
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Landing Page Not Found</h1>
-        <p className="text-gray-600">{error}</p>
-      </div>
-    )
   }
 
   return (
