@@ -11,8 +11,9 @@ interface ConditionalLayoutProps {
 export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname()
   const isLandingPage = pathname.startsWith('/landing/')
+  const isToolsListPage = pathname === '/tools-list'
 
-  if (isLandingPage) {
+  if (isLandingPage || isToolsListPage) {
     return <>{children}</>
   }
 
