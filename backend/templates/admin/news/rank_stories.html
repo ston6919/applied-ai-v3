@@ -34,7 +34,10 @@
                 <div class="card-header">
                     <div class="title-row">
                         <h3 class="story-title"><span class="story-title-text">{{ story.title }}</span></h3>
-                        <button type="button" class="edit-title-btn" aria-label="Edit title" title="Edit title">✏️</button>
+                        <div class="header-buttons">
+                            <button type="button" class="edit-title-btn" aria-label="Edit title" title="Edit title">✏️</button>
+                            <button type="button" class="notion-btn" data-story-id="{{ story.id }}" aria-label="Add to Notion" title="Add to Notion reading list">📖</button>
+                        </div>
                     </div>
                     <input class="title-edit-input" type="text" value="{{ story.title }}" aria-label="Edit title input" style="display:none;" />
                     <div class="story-meta">
@@ -92,8 +95,9 @@
                         <div class="rank-labels">
                             <span class="rank-label">Low</span>
                             <span class="rank-label">High</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
         </div>
             {% endfor %}
         </div>
@@ -366,6 +370,11 @@
     font-weight: 500;
 }
 
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 .title-row {
     display: flex;
     align-items: center;
@@ -377,7 +386,14 @@
     flex: 1;
 }
 
-.edit-title-btn {
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.edit-title-btn,
+.notion-btn {
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.4);
@@ -389,12 +405,33 @@
     transition: all 0.2s ease;
 }
 
-.edit-title-btn:hover {
+.edit-title-btn:hover,
+.notion-btn:hover {
     background: rgba(255, 255, 255, 0.35);
 }
 
 .edit-title-btn.active {
     background: rgba(255, 255, 255, 0.5);
+}
+
+.notion-btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.notion-btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    left: 50%;
+    margin-left: -6px;
+    margin-top: -6px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.6s linear infinite;
 }
 
 .title-edit-input {
@@ -593,6 +630,18 @@ body.dark-mode .view-details-btn:hover {
     color: white !important;
 }
 
+body[data-theme="dark"] .notion-btn,
+body.dark-mode .notion-btn {
+    background: rgba(73, 80, 87, 0.6) !important;
+    color: #e9ecef !important;
+    border-color: #6c757d !important;
+}
+
+body[data-theme="dark"] .notion-btn:hover,
+body.dark-mode .notion-btn:hover {
+    background: rgba(73, 80, 87, 0.8) !important;
+}
+
 /* Additional selectors for different Django admin dark mode implementations */
 .dark-mode .story-title,
 .dark-mode .story-summary,
@@ -728,6 +777,68 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+
+        // Handle Notion button click
+        const notionBtn = cardEl.querySelector('.notion-btn');
+        if (notionBtn) {
+            notionBtn.addEventListener('click', function() {
+                const storyId = this.getAttribute('data-story-id');
+                if (!storyId) return;
+
+                const btn = this;
+                const originalEmoji = '📖';  // Store original emoji
+                
+                // Disable button and show loading state
+                btn.disabled = true;
+                btn.classList.add('loading');
+                
+                const csrfToken = getCsrfToken();
+                if (!csrfToken) {
+                    alert('CSRF token not found. Please refresh the page.');
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    return;
+                }
+
+                // Make AJAX request to add to Notion
+                // URL pattern: /admin/news/canonicalnewsstory/<story_id>/add-to-notion/
+                const notionUrl = `/admin/news/canonicalnewsstory/${storyId}/add-to-notion/`;
+                fetch(notionUrl, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    
+                    if (data.ok) {
+                        // Show success message with checkmark
+                        btn.textContent = '✓';
+                        btn.style.background = 'rgba(40, 167, 69, 0.8)';
+                        setTimeout(function() {
+                            btn.textContent = '📖';
+                            btn.style.background = '';
+                        }, 2000);
+                    } else {
+                        // Show error message
+                        alert('Error: ' + (data.error || 'Failed to add to Notion'));
+                    }
+                })
+                .catch(function(error) {
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    alert('Error: ' + (error.message || 'Failed to add to Notion'));
+                });
+            });
+        }
     });
 });
 </script>

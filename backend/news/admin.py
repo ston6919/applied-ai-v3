@@ -5,6 +5,7 @@ from django.urls import path
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from .models import CanonicalNewsStory, CapturedNewsStory
+from .notion_service import NotionService
 
 
 @staff_member_required
@@ -88,6 +89,60 @@ def rank_stories_view(request):
     return render(request, 'admin/news/rank_stories.html', context)
 
 
+@staff_member_required
+def add_to_notion_view(request, story_id):
+    """Add a canonical news story to Notion reading list"""
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'Only POST method allowed'}, status=405)
+    
+    try:
+        story = get_object_or_404(CanonicalNewsStory, id=story_id)
+        
+        # Get captured stories ordered by captured_at (most recent first)
+        captured_stories = story.captured_stories.all().order_by('-captured_at')
+        
+        # Get first source URL
+        first_url = None
+        if captured_stories.exists():
+            first_captured = captured_stories.first()
+            first_url = first_captured.url if first_captured.url else None
+        
+        # Build additional sources info from remaining sources
+        additional_sources = []
+        if captured_stories.count() > 1:
+            for captured in captured_stories[1:]:
+                source_info = f"{captured.source}"
+                if captured.url:
+                    source_info += f": {captured.url}"
+                additional_sources.append(source_info)
+        
+        additional_sources_text = " | ".join(additional_sources) if additional_sources else None
+        
+        # Add to Notion
+        notion_service = NotionService()
+        result = notion_service.add_story_to_reading_list(
+            title=story.title,
+            first_url=first_url,
+            additional_sources=additional_sources_text
+        )
+        
+        if result:
+            return JsonResponse({
+                'ok': True,
+                'message': f'Story "{story.title}" added to Notion reading list successfully'
+            })
+        else:
+            return JsonResponse({
+                'ok': False,
+                'error': 'Failed to add story to Notion. Check server logs for details.'
+            }, status=500)
+            
+    except CanonicalNewsStory.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'Story not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
+
 @admin.register(CanonicalNewsStory)
 class CanonicalNewsStoryAdmin(admin.ModelAdmin):
     list_display = ['title', 'status', 'rank', 'event_time', 'created_at']
@@ -101,6 +156,7 @@ class CanonicalNewsStoryAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path('rank-stories/', rank_stories_view, name='news_canonicalnewsstory_rank_stories'),
+            path('<int:story_id>/add-to-notion/', add_to_notion_view, name='news_canonicalnewsstory_add_to_notion'),
         ]
         return custom_urls + urls
     

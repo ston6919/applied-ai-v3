@@ -137,6 +137,10 @@ CORS_ALLOW_CREDENTIALS = True
 # MailerLite Configuration
 MAILERLITE_API_KEY = config('MAILERLITE_API_KEY', default='')
 
+# Notion Configuration
+NOTION_API_TOKEN = config('NOTION_API_TOKEN', default='')
+NOTION_DATABASE_ID = '2a5e6dd2d529808787dcc8df6acf3ffa'  # Hardcoded database ID
+
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@applied-ai.com')
