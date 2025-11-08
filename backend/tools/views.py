@@ -57,6 +57,10 @@ class ToolViewSet(viewsets.ModelViewSet):
     ordering_fields = ['updated_at', 'created_at', 'name', 'table_order']
     ordering = ['-created_at', 'name']
     
+    def get_queryset(self):
+        """Optimize queryset by prefetching related categories to avoid N+1 queries"""
+        return Tool.objects.filter(show_on_site=True).prefetch_related('categories')
+    
     def create(self, request, *args, **kwargs):
         """Override create to require bearer token and automatically assign table_order at the bottom of the list"""
         # Check authorization
@@ -135,7 +139,7 @@ class ToolViewSet(viewsets.ModelViewSet):
         # If query is empty, return all tools
         if not query:
             print("[Tools Search] Empty query - returning all tools")
-            tools = Tool.objects.filter(show_on_site=True).order_by('-created_at', 'name')
+            tools = Tool.objects.filter(show_on_site=True).prefetch_related('categories').order_by('-created_at', 'name')
             results = []
             for tool in tools:
                 serializer = self.get_serializer(tool)
@@ -179,7 +183,7 @@ class ToolViewSet(viewsets.ModelViewSet):
             tools = Tool.objects.filter(
                 external_id__in=external_ids,
                 show_on_site=True
-            )
+            ).prefetch_related('categories')
             print(f"[Tools Search] Found {tools.count()} tools in database matching external IDs")
 
             # Create a mapping of external_id to tool
