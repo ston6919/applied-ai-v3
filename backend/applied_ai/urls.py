@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .storage_views import create_presigned_put, upload_file
 
 def api_root(request):
@@ -28,9 +28,14 @@ def health_check(request):
         'message': 'Backend is running'
     })
 
+def admin_favicon(request):
+    svg_content = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🖖</text></svg>'
+    return HttpResponse(svg_content, content_type='image/svg+xml')
+
 urlpatterns = [
     path('', api_root, name='api_root'),
     path('health/', health_check, name='health_check'),
+    path('admin/favicon.ico', admin_favicon),
     path('admin/', admin.site.urls),
     path('api/news/', include('news.urls')),
     path('api/tools/', include('tools.urls')),
