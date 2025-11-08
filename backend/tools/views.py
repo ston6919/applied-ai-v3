@@ -229,6 +229,11 @@ class ToolViewSet(viewsets.ModelViewSet):
         Reorder a tool to a new position.
         Expects: {"new_position": <int>}
         """
+        # Check authorization
+        is_authorized, auth_error = _check_authorization(request)
+        if not is_authorized:
+            return Response({'error': auth_error}, status=status.HTTP_401_UNAUTHORIZED)
+        
         try:
             tool = Tool.objects.get(pk=pk)
             new_position = request.data.get('new_position')
