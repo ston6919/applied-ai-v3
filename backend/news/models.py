@@ -28,7 +28,7 @@ class CanonicalNewsStory(models.Model):
 class CapturedNewsStory(models.Model):
     source = models.CharField(max_length=100)
     source_id = models.IntegerField(null=True, blank=True)
-    url = models.URLField()
+    url = models.URLField(max_length=1000)
     title = models.CharField(max_length=500)
     text = models.TextField(blank=True)
     published_date = models.DateTimeField(null=True, blank=True)

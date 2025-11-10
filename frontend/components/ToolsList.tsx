@@ -406,7 +406,7 @@ export default function ToolsList({
                     className="hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     {/* Name Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-2 whitespace-nowrap">
                       <div className="flex flex-col">
                         <div className="text-sm font-semibold text-gray-900">
                           {tool.name}
@@ -427,7 +427,7 @@ export default function ToolsList({
                     </td>
                     
                     {/* Updated Column */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-2 whitespace-nowrap">
                       <div className="text-sm text-gray-600">
                         {tool.last_updated 
                           ? new Date(tool.last_updated).toLocaleDateString('en-US', { 
@@ -447,19 +447,19 @@ export default function ToolsList({
                     </td>
                     
                     {/* Description Column (Largest) */}
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-2">
                       <div className="text-sm text-gray-600 max-w-2xl">
                         {tool.short_description}
                       </div>
                     </td>
                     
                     {/* Actions Column */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td className="px-6 py-2 whitespace-nowrap text-right">
                       <div className="flex gap-2 justify-end">
                         <Link 
                           href={`/tools/${tool.id}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center px-3 py-2 border border-primary-600 text-sm font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 transition-colors"
+                          className="inline-flex items-center px-3 py-1.5 border border-primary-600 text-sm font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 transition-colors"
                         >
                           See More
                         </Link>
@@ -468,7 +468,7 @@ export default function ToolsList({
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
                         >
                           Try Now
                         </a>
