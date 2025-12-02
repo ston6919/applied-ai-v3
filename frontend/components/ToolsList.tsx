@@ -46,6 +46,8 @@ interface ToolsListProps {
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onSearchTrigger: () => void
   searchResultsCount: number
+  initialTools?: Tool[]
+  initialHasMore?: boolean
 }
 
 export default function ToolsList({ 
@@ -56,18 +58,20 @@ export default function ToolsList({
   setViewMode,
   onSearchChange,
   onSearchTrigger,
-  searchResultsCount
+  searchResultsCount,
+  initialTools,
+  initialHasMore,
 }: ToolsListProps) {
   const router = useRouter()
-  const [tools, setTools] = useState<Tool[]>([])
+  const [tools, setTools] = useState<Tool[]>(initialTools || [])
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialTools || initialTools.length === 0)
   const [searching, setSearching] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [categories, setCategories] = useState<string[]>(['All'])
   const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(initialHasMore ?? true)
   const [sortByUpdated, setSortByUpdated] = useState<'manual' | 'recent'>('manual')
   const observerTarget = useRef<HTMLDivElement>(null)
 
@@ -125,9 +129,12 @@ export default function ToolsList({
 
   // Initial load and reload when viewMode or sort changes
   useEffect(() => {
-    fetchTools(1, true)
-    setCurrentPage(1)
-  }, [fetchTools])
+    // If we already have initial tools from the server, skip the first client-side fetch.
+    if (!initialTools || initialTools.length === 0) {
+      fetchTools(1, true)
+      setCurrentPage(1)
+    }
+  }, [fetchTools, initialTools])
   
   // Refetch when sort order changes
   useEffect(() => {
