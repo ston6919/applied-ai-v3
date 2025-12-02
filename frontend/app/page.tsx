@@ -11,7 +11,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-extrabold mb-16 gradient-text text-soft-shadow">
-              Enabling AI Implementation That Drives Business Growth
+              Build a Smarter, Faster Business With AI
             </h1>
             <p className="text-xl md:text-2xl mb-6 text-gray-700">
               The world of AI is filled with BS and hype. 
