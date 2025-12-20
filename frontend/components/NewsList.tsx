@@ -183,11 +183,6 @@ export default function NewsList() {
           <h3 className="text-xl font-semibold text-gray-900">
             {item.title}
           </h3>
-          <div className="mt-3 flex justify-between items-center">
-            <span className="text-sm text-gray-500">
-              {item.captured_stories_count} source{item.captured_stories_count !== 1 ? 's' : ''}
-            </span>
-          </div>
         </article>
       ))}
       
