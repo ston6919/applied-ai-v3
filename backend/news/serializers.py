@@ -16,13 +16,16 @@ class CanonicalNewsStorySerializer(serializers.ModelSerializer):
 
     def get_source_url(self, obj):
         first_story = obj.captured_stories.first()
+        if first_story and first_story.url:
+            return first_story.url.split('?')[0]
         return first_story.url if first_story else None
 
     def get_source_name(self, obj):
         first_story = obj.captured_stories.first()
         if first_story and first_story.url:
             from urllib.parse import urlparse
-            domain = urlparse(first_story.url).netloc
+            clean_url = first_story.url.split('?')[0]
+            domain = urlparse(clean_url).netloc
             return domain.replace('www.', '')
         return first_story.source if first_story else None
 

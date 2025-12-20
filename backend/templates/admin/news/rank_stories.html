@@ -80,9 +80,18 @@
                     <div class="ranking-section">
                         <div class="show-source-toggle" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #dee2e6;">
                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; color: #495057; font-size: 14px;">
-                                <input type="checkbox" class="show-source-checkbox" style="width: 18px; height: 18px;">
+                                <input type="checkbox" class="show-source-checkbox" style="width: 18px; height: 18px;" checked>
                                 Show source link on website
                             </label>
+                            {% with first_story=story.captured_stories.first %}
+                                {% if first_story and first_story.url %}
+                                <div style="margin-top: 8px; font-size: 12px;">
+                                    <a href="{{ first_story.url }}" target="_blank" style="color: #667eea; text-decoration: underline;">
+                                        View Source Article
+                                    </a>
+                                </div>
+                                {% endif %}
+                            {% endwith %}
                         </div>
                         <label class="ranking-label">Rate this story:</label>
                         <div class="rank-buttons">
@@ -92,7 +101,7 @@
                                 <input type="hidden" name="story_id" value="{{ story.id }}">
                                 <input type="hidden" name="rank" value="{{ rank }}">
                                 <input type="hidden" name="title" value="{{ story.title }}">
-                                <input type="hidden" name="show_source" value="off">
+                                <input type="hidden" name="show_source" value="on">
                                 <button type="submit" class="rank-btn rank-{{ rank }}" title="Rank {{ rank }} - {% if rank == '1' %}Don't Show{% elif rank == '2' %}Below Average{% elif rank == '3' %}Average{% elif rank == '4' %}Above Average{% else %}High Priority{% endif %}">
                                     {% if rank == '1' %}(don't show){% else %}{{ rank }}{% endif %}
                                 </button>
