@@ -52,4 +52,10 @@ class CapturedNewsStory(models.Model):
     def __str__(self):
         return f"{self.source}: {self.title}"
 
+    @property
+    def cleaned_url(self):
+        if self.url:
+            return self.url.split('?')[0]
+        return self.url
+
 

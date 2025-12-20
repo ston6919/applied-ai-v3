@@ -85,9 +85,9 @@
                             </label>
                             {% with first_story=story.captured_stories.first %}
                                 {% if first_story and first_story.url %}
-                                <div style="margin-top: 8px; font-size: 12px;">
-                                    <a href="{{ first_story.url }}" target="_blank" style="color: #667eea; text-decoration: underline;">
-                                        View Source Article
+                                <div style="margin-top: 8px; font-size: 12px; word-break: break-all;">
+                                    <a href="{{ first_story.cleaned_url }}" target="_blank" style="color: #667eea; text-decoration: underline;">
+                                        {{ first_story.cleaned_url }}
                                     </a>
                                 </div>
                                 {% endif %}
