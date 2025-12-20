@@ -16,20 +16,22 @@ def rank_stories_view(request):
         rank = request.POST.get('rank')
         action = request.POST.get('action')
         new_title = request.POST.get('title')
+        show_source = request.POST.get('show_source') == 'on'
         
         if story_id and action == 'undo':
-            # Handle undo action
+            # ... existing logic ...
             try:
                 story = get_object_or_404(CanonicalNewsStory, id=story_id)
                 story.rank = None
                 story.status = 'unranked'
+                story.show_source = False
                 story.save()
                 messages.success(request, f'Story "{story.title}" has been unranked and is now available for ranking again.')
                 return redirect('admin:news_canonicalnewsstory_rank_stories')
             except Exception as e:
                 messages.error(request, f'Error unranking story: {str(e)}')
         elif story_id and action == 'update_title':
-            # Handle ajax title update
+            # ... existing logic ...
             try:
                 story = get_object_or_404(CanonicalNewsStory, id=story_id)
                 if new_title is not None:
@@ -51,11 +53,12 @@ def rank_stories_view(request):
                     story.title = new_title.strip()
                 story.rank = int(rank)
                 story.status = 'ranked'
+                story.show_source = show_source
                 story.save()
                 # Create a success message with undo button
                 undo_url = f'?action=undo&story_id={story_id}'
                 from django.utils.safestring import mark_safe
-                message = mark_safe(f'Story "{story.title}" has been ranked as #{rank} <a href="{undo_url}" class="button" style="margin-left: 10px; background: #dc3545; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 12px;">Undo</a>')
+                message = mark_safe(f'Story "{story.title}" has been ranked as #{rank} (Show Source: {"Yes" if show_source else "No"}) <a href="{undo_url}" class="button" style="margin-left: 10px; background: #dc3545; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; font-size: 12px;">Undo</a>')
                 messages.success(request, message)
                 return redirect('admin:news_canonicalnewsstory_rank_stories')
             except ValueError:

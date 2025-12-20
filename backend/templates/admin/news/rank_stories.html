@@ -78,6 +78,12 @@
                 
                 <div class="card-footer">
                     <div class="ranking-section">
+                        <div class="show-source-toggle" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #dee2e6;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; color: #495057; font-size: 14px;">
+                                <input type="checkbox" class="show-source-checkbox" style="width: 18px; height: 18px;">
+                                Show source link on website
+                            </label>
+                        </div>
                         <label class="ranking-label">Rate this story:</label>
                         <div class="rank-buttons">
                             {% for rank in "12345" %}
@@ -86,6 +92,7 @@
                                 <input type="hidden" name="story_id" value="{{ story.id }}">
                                 <input type="hidden" name="rank" value="{{ rank }}">
                                 <input type="hidden" name="title" value="{{ story.title }}">
+                                <input type="hidden" name="show_source" value="off">
                                 <button type="submit" class="rank-btn rank-{{ rank }}" title="Rank {{ rank }} - {% if rank == '1' %}Don't Show{% elif rank == '2' %}Below Average{% elif rank == '3' %}Average{% elif rank == '4' %}Above Average{% else %}High Priority{% endif %}">
                                     {% if rank == '1' %}(don't show){% else %}{{ rank }}{% endif %}
                                 </button>
@@ -689,11 +696,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const forms = cardEl.querySelectorAll('form.rank-form');
         const storyIdInput = cardEl.querySelector('input[name="story_id"]');
         const csrfInput = cardEl.querySelector('input[name="csrfmiddlewaretoken"]');
+        const showSourceCheckbox = cardEl.querySelector('.show-source-checkbox');
 
         function applyTitleToForms(value) {
             forms.forEach(function(formEl) {
                 const hidden = formEl.querySelector('input[name="title"]');
                 if (hidden) hidden.value = value;
+            });
+        }
+
+        function applyShowSourceToForms(checked) {
+            forms.forEach(function(formEl) {
+                const hidden = formEl.querySelector('input[name="show_source"]');
+                if (hidden) hidden.value = checked ? 'on' : 'off';
+            });
+        }
+
+        if (showSourceCheckbox) {
+            showSourceCheckbox.addEventListener('change', function() {
+                applyShowSourceToForms(this.checked);
             });
         }
 
@@ -771,9 +792,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         forms.forEach(function(formEl) {
             formEl.addEventListener('submit', function() {
-                const hidden = formEl.querySelector('input[name="title"]');
-                if (hidden) {
-                    hidden.value = titleInput ? titleInput.value : (titleText ? titleText.textContent : '');
+                const hiddenTitle = formEl.querySelector('input[name="title"]');
+                if (hiddenTitle) {
+                    hiddenTitle.value = titleInput ? titleInput.value : (titleText ? titleText.textContent : '');
+                }
+                const hiddenShowSource = formEl.querySelector('input[name="show_source"]');
+                if (hiddenShowSource && showSourceCheckbox) {
+                    hiddenShowSource.value = showSourceCheckbox.checked ? 'on' : 'off';
                 }
             });
         });
