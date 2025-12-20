@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import AutomationsList from '@/components/AutomationsList'
 
-export default function AutomationsPage() {
+export default function TemplatesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [searchTrigger, setSearchTrigger] = useState(0)

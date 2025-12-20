@@ -24,7 +24,7 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4">Resources</h4>
             <ul className="space-y-2">
-              <li><Link href="/automations" className="text-gray-400 hover:text-white transition-colors">Automations</Link></li>
+              <li><Link href="/templates" className="text-gray-400 hover:text-white transition-colors">Templates</Link></li>
               <li><Link href="/mastermind" className="text-gray-400 hover:text-white transition-colors">Mastermind</Link></li>
             </ul>
           </div>

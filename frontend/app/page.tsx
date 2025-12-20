@@ -58,7 +58,7 @@ export default function Home() {
             </Link>
 
             {/* Card: Templates */}
-            <Link href="/automations" className="group relative block overflow-hidden rounded-2xl h-40 md:h-48 shadow-lg ring-1 ring-gray-200/60 bg-gradient-to-br from-rose-400 via-pink-500 to-orange-500 transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl" aria-label="Go to Templates">
+            <Link href="/templates" className="group relative block overflow-hidden rounded-2xl h-40 md:h-48 shadow-lg ring-1 ring-gray-200/60 bg-gradient-to-br from-rose-400 via-pink-500 to-orange-500 transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl" aria-label="Go to Templates">
               <div className="absolute inset-0 opacity-20 group-hover:opacity-25 transition-opacity bg-[radial-gradient(600px_300px_at_20%_20%,#fff,transparent)]" />
               <div className="absolute top-5 left-5 text-left">
                 <h3 className="text-2xl font-bold text-white drop-shadow-sm">Templates</h3>

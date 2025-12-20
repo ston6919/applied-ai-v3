@@ -23,11 +23,6 @@ export default function RootLayout({
           src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
           async
         />
-        <Script
-          src="https://analytics.ahrefs.com/analytics.js"
-          data-key="RssACXjBObr7g5F/AePMjQ"
-          async
-        />
       </head>
       <body className={inter.className}>
         {/* Global background layers */}

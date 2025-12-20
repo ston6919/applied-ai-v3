@@ -46,8 +46,6 @@ interface ToolsListProps {
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onSearchTrigger: () => void
   searchResultsCount: number
-  initialTools?: Tool[]
-  initialHasMore?: boolean
 }
 
 export default function ToolsList({ 
@@ -58,20 +56,18 @@ export default function ToolsList({
   setViewMode,
   onSearchChange,
   onSearchTrigger,
-  searchResultsCount,
-  initialTools,
-  initialHasMore,
+  searchResultsCount
 }: ToolsListProps) {
   const router = useRouter()
-  const [tools, setTools] = useState<Tool[]>(initialTools || [])
+  const [tools, setTools] = useState<Tool[]>([])
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
-  const [loading, setLoading] = useState(!initialTools || initialTools.length === 0)
+  const [loading, setLoading] = useState(true)
   const [searching, setSearching] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [categories, setCategories] = useState<string[]>(['All'])
   const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(initialHasMore ?? true)
+  const [hasMore, setHasMore] = useState(true)
   const [sortByUpdated, setSortByUpdated] = useState<'manual' | 'recent'>('manual')
   const observerTarget = useRef<HTMLDivElement>(null)
 
@@ -129,12 +125,9 @@ export default function ToolsList({
 
   // Initial load and reload when viewMode or sort changes
   useEffect(() => {
-    // If we already have initial tools from the server, skip the first client-side fetch.
-    if (!initialTools || initialTools.length === 0) {
-      fetchTools(1, true)
-      setCurrentPage(1)
-    }
-  }, [fetchTools, initialTools])
+    fetchTools(1, true)
+    setCurrentPage(1)
+  }, [fetchTools])
   
   // Refetch when sort order changes
   useEffect(() => {
@@ -301,70 +294,38 @@ export default function ToolsList({
       </div>
         )}
         
-        {/* Sort toggle (left), Search + View toggle (right) */}
-        <div className="flex items-center justify-between gap-3">
-          {/* Left: Sort Toggle (table view only) */}
-          {viewMode === 'table' ? (
-            <div className="inline-flex rounded-lg border border-gray-300 bg-white p-1 text-sm">
-              <button
-                type="button"
-                onClick={() => setSortByUpdated('manual')}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  sortByUpdated === 'manual'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Best
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortByUpdated('recent')}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  sortByUpdated === 'recent'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Newest
-              </button>
-            </div>
-          ) : (
-            <div />
-          )}
-
-          {/* Right: Search (table view) + View Mode Toggle */}
-          <div className="flex items-center gap-3">
-            {/* Compact Search Bar - Only show in table view */}
-            {viewMode === 'table' && (
-              <div className="w-64">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search tools..."
-                    value={searchQuery}
-                    onChange={onSearchChange}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        onSearchTrigger()
-                      }
-                    }}
-                    className="w-full px-3 py-2 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
+        {/* Search Bar and View Toggle */}
+        <div className="flex items-center justify-end gap-3">
+          {/* Compact Search Bar - Only show in table view */}
+          {viewMode === 'table' && (
+            <div className="w-64">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search tools..."
+                  value={searchQuery}
+                  onChange={onSearchChange}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      onSearchTrigger()
+                    }
+                  }}
+                  className="w-full px-3 py-2 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                 </div>
-                {searchQuery && searchResultsCount > 0 && (
-                  <div className="mt-1 text-xs text-gray-600 text-right">
-                    Found {searchResultsCount} tool{searchResultsCount === 1 ? '' : 's'}
-                  </div>
-                )}
               </div>
-            )}
-
+              {searchQuery && searchResultsCount > 0 && (
+                <div className="mt-1 text-xs text-gray-600 text-right">
+                  Found {searchResultsCount} tool{searchResultsCount === 1 ? '' : 's'}
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* View Mode Toggle */}
           <div className="inline-flex rounded-lg border border-gray-300 bg-white p-1">
             <button
@@ -393,7 +354,6 @@ export default function ToolsList({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
             </button>
-          </div>
           </div>
         </div>
       </div>
