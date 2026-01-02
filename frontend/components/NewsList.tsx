@@ -6,7 +6,7 @@ interface NewsItem {
   id: number
   title: string
   summary: string
-  event_time: string
+  event_time: string | null
   status: string
   rank?: number
   created_at: string
@@ -23,7 +23,8 @@ interface PaginatedResponse {
   results: NewsItem[]
 }
 
-const formatDate = (iso: string): string => {
+const formatDate = (iso: string | null): string => {
+  if (!iso) return '—'
   try {
     const date = new Date(iso)
     const day = date.getUTCDate()
@@ -181,7 +182,7 @@ export default function NewsList() {
       {news.map((item) => (
         <article key={item.id} className="card p-4 hover:shadow-lg transition-shadow duration-300">
           <div className="mb-2 text-sm text-gray-500">
-            <span>{formatDate(item.created_at)}</span>
+            <span>{formatDate(item.event_time || item.created_at)}</span>
           </div>
           <h3 className="text-xl font-semibold text-gray-900">
             {item.title}

@@ -18,7 +18,7 @@ class CanonicalNewsStory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-event_time', '-created_at']
         verbose_name = 'Canonical News Story'
         verbose_name_plural = 'Canonical News Stories'
 

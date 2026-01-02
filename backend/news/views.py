@@ -19,7 +19,7 @@ class CanonicalNewsStoryViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status']
     search_fields = ['title', 'summary']
     ordering_fields = ['created_at', 'event_time', 'rank']
-    ordering = ['-created_at']
+    ordering = ['-event_time', '-created_at']
 
 
 class CapturedNewsStoryViewSet(viewsets.ModelViewSet):
