@@ -26,7 +26,7 @@ class Tool(models.Model):
     features = models.JSONField(default=list, blank=True, null=True)  # Array of strings
     new_features = models.JSONField(default=list, blank=True, null=True)  # Array of strings for new features
     website_url = models.URLField(verbose_name='Website URL', blank=True, default='')
-    affiliate_url = models.URLField(verbose_name='Affiliate URL', blank=True, default='')
+    affiliate_url = models.URLField(verbose_name='Affiliate URL', blank=True, null=True, default='')
     source_url = models.URLField(blank=True, null=True, verbose_name='Source URL')
     image_url = models.URLField(blank=True, null=True, verbose_name='Image URL')
     external_id = models.IntegerField(blank=True, null=True, db_index=True)
