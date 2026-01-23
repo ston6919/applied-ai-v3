@@ -33,6 +33,31 @@ body {
     @apply bg-white rounded-2xl shadow-lg p-6 border border-gray-200/60;
   }
 
+  /* Gradient border for rank 5 stories */
+  .gradient-border {
+    @apply relative;
+    border: none !important;
+    background-clip: padding-box;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 1rem;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6 30%, #ec4899 65%, #f59e0b);
+    z-index: 0;
+    padding: 3px;
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .gradient-border > * {
+    position: relative;
+    z-index: 1;
+  }
+
   /* Gradient CTA button */
   .btn-gradient {
     @apply inline-flex items-center justify-center font-medium text-white rounded-full px-5 py-2 shadow-lg transition-transform duration-200;

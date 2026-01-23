@@ -67,8 +67,8 @@ export default function NewsList() {
 
   const fetchNews = useCallback(async (pageUrl?: string) => {
     try {
-      const base = process.env.NEXT_PUBLIC_API_URL || ''
-      const apiBase = base ? base.replace(/\/$/, '') : ''
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
+      const apiBase = base ? base.replace(/\/$/, '') : 'http://127.0.0.1:8010'
       const url = pageUrl || `${apiBase}/api/news/canonical-stories/?page=1&page_size=10`
 
       // Debug details
@@ -180,7 +180,12 @@ export default function NewsList() {
   return (
     <div className="grid grid-cols-1 gap-4">
       {news.map((item) => (
-        <article key={item.id} className="card p-4 hover:shadow-lg transition-shadow duration-300">
+        <article 
+          key={item.id} 
+          className={`card p-4 hover:shadow-lg transition-shadow duration-300 ${
+            item.rank === 5 ? 'gradient-border' : ''
+          }`}
+        >
           <div className="mb-2 text-sm text-gray-500">
             <span>{formatDate(item.event_time || item.created_at)}</span>
           </div>
