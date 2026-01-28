@@ -190,13 +190,13 @@ def upload_file(request):
     - Authorization: Bearer {token} header
     - file: binary file data (multipart/form-data)
     - filename: name for the file in the Space
-    - acl: (optional) 'public-read' or 'private' (default: 'public-read')
+    - acl: (optional) 'public-read', 'private', or 'authenticated-read' (if not provided, uses bucket default)
     
     Security features:
     - Bearer token authentication
     - File size validation (max 50MB)
     - Filename sanitization (prevents path traversal)
-    - ACL validation
+    - ACL validation (if provided)
     - Error logging without exposing internals
     """
     try:
@@ -229,11 +229,11 @@ def upload_file(request):
         folder_prefix = 'api-uploads/'
         full_key = f"{folder_prefix}{filename}"
         
-        # Get ACL setting (default to public-read)
-        acl = request.POST.get('acl', 'public-read')
+        # Get ACL setting (optional - only use if explicitly provided)
+        acl = request.POST.get('acl')
         
-        # Validate ACL
-        if not _validate_acl(acl):
+        # Validate ACL if provided
+        if acl and not _validate_acl(acl):
             return JsonResponse({
                 'error': 'Invalid ACL. Allowed values: public-read, private, authenticated-read'
             }, status=400)
@@ -245,19 +245,25 @@ def upload_file(request):
         s3 = _get_s3_client()
         bucket = config('SPACES_BUCKET')
         
+        # Prepare upload parameters
+        upload_params = {
+            'Bucket': bucket,
+            'Key': full_key,
+            'Body': file_obj,
+            'ContentType': content_type,
+        }
+        
+        # Only add ACL if explicitly provided (DigitalOcean Spaces may not support ACLs)
+        if acl:
+            upload_params['ACL'] = acl
+        
         # Upload the file using chunked reading to avoid memory issues
         # For files uploaded via Django, we can use the file object directly
-        s3.put_object(
-            Bucket=bucket,
-            Key=full_key,
-            Body=file_obj,
-            ContentType=content_type,
-            ACL=acl
-        )
+        s3.put_object(**upload_params)
         
-        # Generate the public URL (only return if public-read)
+        # Generate the public URL (assume public if no ACL specified, or if ACL is public-read)
         public_url = None
-        if acl == 'public-read':
+        if not acl or acl == 'public-read':
             cdn_base = config('SPACES_CDN_BASE', default='')
             if cdn_base:
                 # CDN URL includes bucket in path: https://cdn.example.com/bucket-name/folder/file.jpg
