@@ -7,11 +7,6 @@ const devBackendUrl = 'http://localhost:8010'
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  watchOptions: {
-    ignored: ['**/backend/**', '**/node_modules/**', '**/.git/**', '**/venv/**'],
-    poll: 1000,
-    aggregateTimeout: 300
-  },
   async rewrites() {
     if (isProd) {
       // No rewrites in production to avoid pointing at localhost
