@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
 
 interface NewsItem {
   id: number
@@ -16,12 +17,7 @@ interface NewsItem {
   source_name?: string
 }
 
-interface PaginatedResponse {
-  count: number
-  next: string | null
-  previous: string | null
-  results: NewsItem[]
-}
+const PAGE_SIZE = 10
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '—'
@@ -56,7 +52,7 @@ export default function NewsList() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
-  const [nextPage, setNextPage] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
@@ -65,58 +61,115 @@ export default function NewsList() {
     setMounted(true)
   }, [])
 
-  const fetchNews = useCallback(async (pageUrl?: string) => {
+  const fetchNews = useCallback(async (page: number = 1) => {
+    if (!supabase) {
+      setError('Supabase client not initialized')
+      setLoading(false)
+      setLoadingMore(false)
+      return
+    }
+
     try {
-      const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
-      const apiBase = base ? base.replace(/\/$/, '') : 'http://127.0.0.1:8010'
-      const url = pageUrl || `${apiBase}/api/news/canonical-stories/?page=1&page_size=10`
+      const from = (page - 1) * PAGE_SIZE
+      const to = from + PAGE_SIZE - 1
 
-      // Debug details
-      // eslint-disable-next-line no-console
-      console.log('[News] Fetching', {
-        origin: typeof window !== 'undefined' ? window.location.origin : 'ssr',
-        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-        apiBase,
-        url
-      })
+      // Fetch news stories from Supabase
+      let query = supabase
+        .from('canonical_news_story')
+        .select('*', { count: 'exact' })
+        .eq('status', 'ranked')
+        .gte('rank', 2)
+        .order('event_time', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false })
+        .range(from, to)
 
-      const res = await fetch(url, { next: { revalidate: 60 } })
+      const { data, error: fetchError, count } = await query
 
-      // eslint-disable-next-line no-console
-      console.log('[News] Response', {
-        ok: res.ok,
-        status: res.status,
-        statusText: res.statusText,
-        finalURL: (res as any).url,
-        contentType: res.headers.get('content-type')
-      })
-      
-      if (!res.ok) {
-        throw new Error(`Failed to fetch news: ${res.status}`)
+      // Fetch captured stories for each news item if needed
+      if (data && data.length > 0) {
+        const storyIds = data.map((item: any) => item.id)
+        const { data: capturedStories } = await supabase
+          .from('captured_news_story')
+          .select('id, url, source, canonical_story_id')
+          .in('canonical_story_id', storyIds)
+          .order('captured_at', { ascending: false })
+
+        // Group captured stories by canonical_story_id
+        const storiesByCanonical: Record<number, any[]> = {}
+        capturedStories?.forEach((story: any) => {
+          const canonicalId = story.canonical_story_id
+          if (!storiesByCanonical[canonicalId]) {
+            storiesByCanonical[canonicalId] = []
+          }
+          storiesByCanonical[canonicalId].push(story)
+        })
+
+        // Attach captured stories to each news item
+        data.forEach((item: any) => {
+          item.captured_stories = storiesByCanonical[item.id] || []
+        })
       }
-      
-      const data: PaginatedResponse = await res.json()
-      const allItems: NewsItem[] = data.results || []
-      
-      // Filter to only show ranked stories with rank 2 or higher
-      const rankedItems = allItems.filter(item => item.status === 'ranked' && item.rank && item.rank >= 2)
-      
-      if (pageUrl) {
-        // Loading more items
-        setNews(prev => [...prev, ...rankedItems])
-        setLoadingMore(false)
-      } else {
+
+      if (fetchError) {
+        throw new Error(fetchError.message)
+      }
+
+      // Transform the data to match NewsItem interface
+      const transformedItems: NewsItem[] = (data || []).map((item: any) => {
+        const capturedStories = item.captured_stories || []
+        const firstStory = capturedStories[0]
+        
+        // Extract source URL and name from first captured story
+        let sourceUrl: string | undefined
+        let sourceName: string | undefined
+        
+        if (firstStory) {
+          sourceUrl = firstStory.url?.split('?')[0] // Clean URL
+          if (sourceUrl) {
+            try {
+              const domain = new URL(sourceUrl).hostname.replace('www.', '')
+              sourceName = domain
+            } catch {
+              sourceName = firstStory.source
+            }
+          } else {
+            sourceName = firstStory.source
+          }
+        }
+
+        return {
+          id: item.id,
+          title: item.title,
+          summary: item.summary || '',
+          event_time: item.event_time,
+          status: item.status,
+          rank: item.rank,
+          created_at: item.created_at,
+          captured_stories_count: capturedStories.length,
+          show_source: item.show_source,
+          source_url: sourceUrl,
+          source_name: sourceName,
+        }
+      })
+
+      if (page === 1) {
         // Initial load
-        setNews(rankedItems)
+        setNews(transformedItems)
         setLoading(false)
+      } else {
+        // Loading more items
+        setNews(prev => [...prev, ...transformedItems])
+        setLoadingMore(false)
       }
-      
-      setNextPage(data.next)
-      setHasMore(!!data.next)
+
+      // Check if there are more pages
+      const totalCount = count || 0
+      const hasMorePages = to < totalCount - 1
+      setHasMore(hasMorePages)
       
     } catch (err: any) {
       // eslint-disable-next-line no-console
-      console.error('[News] Error fetching news]:', {
+      console.error('[News] Error fetching news:', {
         name: err?.name,
         message: err?.message,
         stack: err?.stack
@@ -129,15 +182,17 @@ export default function NewsList() {
 
   useEffect(() => {
     if (!mounted) return
-    fetchNews()
+    fetchNews(1)
   }, [mounted, fetchNews])
 
   const loadMore = useCallback(() => {
-    if (loadingMore || !hasMore || !nextPage) return
+    if (loadingMore || !hasMore) return
     
     setLoadingMore(true)
+    const nextPage = currentPage + 1
+    setCurrentPage(nextPage)
     fetchNews(nextPage)
-  }, [loadingMore, hasMore, nextPage, fetchNews])
+  }, [loadingMore, hasMore, currentPage, fetchNews])
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
