@@ -44,8 +44,7 @@ export default function LandingPageContent({ initialData }: LandingPageContentPr
     setSubmitError(null)
 
     try {
-      const base = process.env.NEXT_PUBLIC_API_URL || ''
-      const response = await fetch(`${base}/api/landing-pages/${slug}/submit/`, {
+      const response = await fetch(`/api/landing-pages/${slug}/submit/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -194,7 +193,7 @@ export default function LandingPageContent({ initialData }: LandingPageContentPr
                     </>
                   ) : (
                     <>
-                      Get My Templates
+                      Send To Me Now
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
