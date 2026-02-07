@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
 
 interface NewsItem {
   id: number
@@ -62,78 +61,35 @@ export default function NewsList() {
   }, [])
 
   const fetchNews = useCallback(async (page: number = 1) => {
-    if (!supabase) {
-      setError('Supabase client not initialized')
-      setLoading(false)
-      setLoadingMore(false)
-      return
-    }
-
     try {
-      const from = (page - 1) * PAGE_SIZE
-      const to = from + PAGE_SIZE - 1
-
-      // Fetch news stories from Supabase
-      let query = supabase
-        .from('canonical_news_story')
-        .select('*', { count: 'exact' })
-        .eq('status', 'ranked')
-        .gte('rank', 2)
-        .order('event_time', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false })
-        .range(from, to)
-
-      const { data, error: fetchError, count } = await query
-
-      // Fetch captured stories for each news item if needed
-      if (data && data.length > 0) {
-        const storyIds = data.map((item: any) => item.id)
-        const { data: capturedStories } = await supabase
-          .from('captured_news_story')
-          .select('id, url, source, canonical_story_id')
-          .in('canonical_story_id', storyIds)
-          .order('captured_at', { ascending: false })
-
-        // Group captured stories by canonical_story_id
-        const storiesByCanonical: Record<number, any[]> = {}
-        capturedStories?.forEach((story: any) => {
-          const canonicalId = story.canonical_story_id
-          if (!storiesByCanonical[canonicalId]) {
-            storiesByCanonical[canonicalId] = []
-          }
-          storiesByCanonical[canonicalId].push(story)
-        })
-
-        // Attach captured stories to each news item
-        data.forEach((item: any) => {
-          item.captured_stories = storiesByCanonical[item.id] || []
-        })
+      // Fetch news through protected API route with rate limiting
+      const response = await fetch(`/api/news?page=${page}&pageSize=${PAGE_SIZE}`)
+      
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error('Too many requests. Please wait a moment and try again.')
+        }
+        throw new Error(`Failed to fetch news: ${response.statusText}`)
       }
 
-      if (fetchError) {
-        throw new Error(fetchError.message)
+      const result = await response.json()
+      
+      if (result.error) {
+        throw new Error(result.error)
       }
 
       // Transform the data to match NewsItem interface
-      const transformedItems: NewsItem[] = (data || []).map((item: any) => {
-        const capturedStories = item.captured_stories || []
-        const firstStory = capturedStories[0]
+      const transformedItems: NewsItem[] = (result.data || []).map((item: any) => {
+        // Extract source URL and name
+        let sourceUrl: string | undefined = item.source_url
+        let sourceName: string | undefined = item.source_name
         
-        // Extract source URL and name from first captured story
-        let sourceUrl: string | undefined
-        let sourceName: string | undefined
-        
-        if (firstStory) {
-          sourceUrl = firstStory.url?.split('?')[0] // Clean URL
-          if (sourceUrl) {
-            try {
-              const domain = new URL(sourceUrl).hostname.replace('www.', '')
-              sourceName = domain
-            } catch {
-              sourceName = firstStory.source
-            }
-          } else {
-            sourceName = firstStory.source
+        if (sourceUrl) {
+          try {
+            const domain = new URL(sourceUrl).hostname.replace('www.', '')
+            sourceName = sourceName || domain
+          } catch {
+            // Keep existing sourceName or use fallback
           }
         }
 
@@ -145,7 +101,7 @@ export default function NewsList() {
           status: item.status,
           rank: item.rank,
           created_at: item.created_at,
-          captured_stories_count: capturedStories.length,
+          captured_stories_count: item.captured_stories_count || 0,
           show_source: item.show_source,
           source_url: sourceUrl,
           source_name: sourceName,
@@ -163,9 +119,7 @@ export default function NewsList() {
       }
 
       // Check if there are more pages
-      const totalCount = count || 0
-      const hasMorePages = to < totalCount - 1
-      setHasMore(hasMorePages)
+      setHasMore(result.hasMore || false)
       
     } catch (err: any) {
       // eslint-disable-next-line no-console

@@ -71,53 +71,92 @@ export default function ToolsList({
   const [sortByUpdated, setSortByUpdated] = useState<'manual' | 'recent'>('manual')
   const observerTarget = useRef<HTMLDivElement>(null)
 
+  // Debug component mount and state
+  useEffect(() => {
+    console.log('[ToolsList] Component mounted/updated', {
+      toolsCount: tools.length,
+      loading,
+      searching,
+      viewMode,
+      searchQuery,
+      sortByUpdated
+    })
+  }, [tools.length, loading, searching, viewMode, searchQuery, sortByUpdated])
+
   const fetchTools = useCallback(async (page: number, reset: boolean = false) => {
+    console.log('[ToolsList] fetchTools called', { page, reset, viewMode, searchQuery, sortByUpdated })
+    
     try {
       if (page === 1 && reset) {
+        console.log('[ToolsList] Setting loading to true')
         setLoading(true)
       } else {
+        console.log('[ToolsList] Setting loadingMore to true')
         setLoadingMore(true)
       }
 
-      const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
-      
-      // Use manual ordering or updated sort for table view when not searching
-      let orderingParam = ''
+      // Determine ordering parameter
+      let orderingParam = 'manual'
       if (viewMode === 'table' && (!searchQuery || searchQuery.trim() === '')) {
-        orderingParam = sortByUpdated === 'recent' 
-          ? '&ordering=-updated_at' 
-          : '&ordering=manual'
+        orderingParam = sortByUpdated === 'recent' ? 'recent' : 'manual'
       }
+
+      console.log('[ToolsList] Fetching from API', { page, orderingParam })
+
+      // Call our API route which uses service role key
+      const response = await fetch(`/api/tools?page=${page}&pageSize=20&ordering=${orderingParam}`)
       
-      const response = await fetch(`${base}/api/tools/?page=${page}${orderingParam}`)
-      
+      console.log('[ToolsList] API response status:', response.status)
+
       if (!response.ok) {
-        throw new Error('Failed to fetch tools')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[ToolsList] API error:', errorData)
+        throw new Error(`Failed to fetch tools: ${errorData.error || response.statusText}`)
       }
       
       const data = await response.json()
-      const toolsData = data.results || data
+      console.log('[ToolsList] API response data:', {
+        resultsCount: data.results?.length || 0,
+        totalCount: data.count || 0,
+        hasNext: !!data.next,
+        sample: data.results?.[0]
+      })
+
+      const toolsData = data.results || []
       
-      // Update tools and extract categories
+      // Update tools
       setTools(prev => {
         const newTools = reset ? toolsData : [...prev, ...toolsData]
-        
-        // Extract unique categories from all tools
-        const uniqueCategories = new Set<string>()
-        newTools.forEach((tool: Tool) => {
-          tool.categories.forEach(cat => uniqueCategories.add(cat.name))
+        console.log('[ToolsList] Updating tools state', { 
+          prevCount: prev.length, 
+          newCount: newTools.length,
+          reset 
         })
-        setCategories(['All', ...Array.from(uniqueCategories).sort()])
+        
+        // Extract unique categories (empty for now since Supabase doesn't have categories)
+        setCategories(['All'])
         
         return newTools
       })
       
       // Check if there are more pages
-      setHasMore(!!data.next)
+      const hasMorePages = !!data.next
+      console.log('[ToolsList] Pagination check', { 
+        returnedCount: toolsData.length, 
+        hasMore: hasMorePages 
+      })
+      setHasMore(hasMorePages)
       
     } catch (error) {
-      console.error('Error fetching tools:', error)
+      console.error('[ToolsList] Error fetching tools:', error)
+      if (error instanceof Error) {
+        console.error('[ToolsList] Error details:', {
+          message: error.message,
+          stack: error.stack
+        })
+      }
     } finally {
+      console.log('[ToolsList] Setting loading states to false')
       setLoading(false)
       setLoadingMore(false)
     }
@@ -125,6 +164,7 @@ export default function ToolsList({
 
   // Initial load and reload when viewMode or sort changes
   useEffect(() => {
+    console.log('[ToolsList] Initial load effect triggered')
     fetchTools(1, true)
     setCurrentPage(1)
   }, [fetchTools])
@@ -138,52 +178,49 @@ export default function ToolsList({
   }, [sortByUpdated, viewMode, fetchTools])
 
   const performSearch = useCallback(async () => {
-    
     setSearching(true)
     
     try {
-      const base = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8010'
-      const searchUrl = `${base}/api/tools/search/`
-      const searchBody = { query: searchQuery || '' }
+      const query = searchQuery?.trim() || ''
       
-      
-      
-      const response = await fetch(searchUrl, {
+      console.log('[ToolsList] Performing search', { query })
+
+      // Call our API route which uses service role key
+      const response = await fetch('/api/tools/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(searchBody),
+        body: JSON.stringify({ query }),
       })
 
-      
-      
-      const data = await response.json()
-      
-      
+      console.log('[ToolsList] Search API response status:', response.status)
+
       if (!response.ok) {
-        
-        throw new Error(`Search failed with status ${response.status}: ${data.error || 'Unknown error'}`)
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[ToolsList] Search API error:', errorData)
+        throw new Error(`Search failed: ${errorData.error || response.statusText}`)
       }
-      
-      
-      
-      // Show the embedding vector from OpenAI
-      if (data.debug && data.debug.openai_response && data.debug.openai_response.embedding_vector) {
-        
-      }
-      
+
+      const data = await response.json()
+      console.log('[ToolsList] Search results:', {
+        query: data.query,
+        resultsCount: data.results?.length || 0,
+        total: data.total || 0
+      })
+
       setSearchResults(data.results || [])
       if (onSearchResults) {
-        
         onSearchResults(data.results || [])
       }
     } catch (error) {
-      
+      console.error('[ToolsList] Search error:', error)
       setSearchResults([])
+      if (onSearchResults) {
+        onSearchResults([])
+      }
     } finally {
       setSearching(false)
-      
     }
   }, [searchQuery, onSearchResults])
 
@@ -226,7 +263,15 @@ export default function ToolsList({
     ? searchResults.map(result => result.tool)
     : tools
   
-  
+  console.log('[ToolsList] Display tools calculation:', {
+    searchQuery,
+    searchResultsLength: searchResults.length,
+    toolsLength: tools.length,
+    displayToolsLength: displayTools.length,
+    selectedCategory,
+    loading,
+    searching
+  })
 
   const filteredTools = (selectedCategory === 'All' 
     ? displayTools 
@@ -238,6 +283,11 @@ export default function ToolsList({
       if (!a.is_featured && b.is_featured) return 1
     }
     return 0
+  })
+
+  console.log('[ToolsList] Filtered tools:', {
+    filteredToolsLength: filteredTools.length,
+    selectedCategory
   })
 
   if (loading) {
@@ -258,6 +308,16 @@ export default function ToolsList({
   }
 
   if (filteredTools.length === 0 && !loading) {
+    console.log('[ToolsList] Rendering empty state:', {
+      filteredToolsLength: filteredTools.length,
+      loading,
+      searching,
+      searchQuery,
+      selectedCategory,
+      toolsLength: tools.length,
+      displayToolsLength: displayTools.length,
+      searchResultsLength: searchResults.length
+    })
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 text-lg">
@@ -456,13 +516,6 @@ export default function ToolsList({
                     {/* Actions Column */}
                     <td className="px-6 py-2 whitespace-nowrap text-right">
                       <div className="flex gap-2 justify-end">
-                        <Link 
-                          href={`/tools/${tool.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center px-3 py-1.5 border border-primary-600 text-sm font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 transition-colors"
-                        >
-                          See More
-                        </Link>
                         <a 
                           href={tool.affiliate_url || tool.website_url}
                           target="_blank"
