@@ -37,7 +37,7 @@ export default function CCSkillsPage() {
     })
   }
 
-  const categories = [...new Set(skills.map((s) => s.category ?? '').filter((c) => c !== ''))].sort()
+  const categories = Array.from(new Set(skills.map((s) => s.category ?? '').filter((c) => c !== ''))).sort()
   const hasUncategorized = skills.some((s) => s.category == null || s.category === '')
   const filteredSkills =
     selectedCategory === null
