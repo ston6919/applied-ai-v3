@@ -25,11 +25,15 @@ export async function GET(request: NextRequest) {
     
     try {
       const promotionCode = await stripe.promotionCodes.retrieve(
-        'promo_1SyuWZRosRcw9chfcsvuOZ68'
+        'promo_1SyuWZRosRcw9chfcsvuOZ68',
+        { expand: ['coupon'] }
       )
+      const couponId = typeof promotionCode.coupon === 'string' 
+        ? promotionCode.coupon 
+        : promotionCode.coupon.id
       discounts = [
         {
-          coupon: promotionCode.coupon.id,
+          coupon: couponId,
         },
       ]
     } catch (promoError: any) {
