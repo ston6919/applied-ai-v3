@@ -185,7 +185,7 @@ export default function OfferPage({ params, searchParams }: OfferPageProps) {
   const firstName = Array.isArray(nameParam) ? nameParam[0] : nameParam
 
   const headline = 'Turn AI from theory into a working system in your business this month.'
-  const subheadline = 'Get a curated set of workflows, frameworks, and real-world examples designed to connect AI directly to your revenue, operations, and time, for less than the cost of a takeaway.'
+  const subheadline = 'Get all of my most impactful resources in one bundle.'
 
   return (
     <div className="py-8 md:py-20">
@@ -194,37 +194,54 @@ export default function OfferPage({ params, searchParams }: OfferPageProps) {
         {/* Context bar */}
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-primary-50/70 px-4 py-2 text-sm font-medium text-primary-800 shadow-sm">
-            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="inline-flex h-2 w-2 min-h-2 min-w-2 flex-shrink-0 rounded-full bg-emerald-400 animate-pulse" />
             <span>
-              Your resources are on their way to your inbox (make sure you check spam). But I have something special to show you...
+              Your resources are on their way to your inbox. But I have something special for you...
             </span>
           </div>
         </div>
 
         {/* Hero section */}
-        <section className="grid gap-10 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-center">
-          <div className="text-center md:text-left">
+        <section className="flex flex-col gap-10 md:grid md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-center">
+          {/* Text content wrapper for desktop */}
+          <div className="text-center md:text-left flex flex-col gap-6">
             {firstName && (
               <p className="mb-2 text-sm text-gray-600">{`Hi ${firstName},`}</p>
             )}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-5 gradient-text text-soft-shadow">
               {headline}
             </h1>
-            <p className="text-sm md:text-base mb-6 text-white font-medium border-l-4 border-red-600 pl-4 py-2 bg-red-500 rounded-r md:text-left text-center md:inline-block">
-              This is a one-time deal. You will not see this offer again.
-            </p>
             <p className="text-lg md:text-xl text-gray-700 mb-4">
               {subheadline}
             </p>
+            <p className="text-sm md:text-base mb-6 text-white font-medium border-l-4 border-red-600 pl-4 py-2 bg-red-500 rounded-r md:text-left text-center md:inline-block">
+              This is a one-time deal. You will not see this offer again.
+            </p>
+
+            {/* Hero image / bundle preview - appears here on mobile */}
+            <div className="relative md:hidden">
+              <div className="blob bg-indigo-300 w-40 h-40 -top-10 -left-6" />
+              <div className="blob bg-pink-300 w-40 h-40 -bottom-6 -right-8" />
+              <div className="relative card overflow-hidden shadow-xl border border-gray-200/80">
+                <Image
+                  src="/ALL.png"
+                  alt="Automation & AI Power Pack"
+                  width={608}
+                  height={400}
+                  className="w-full h-auto object-contain"
+                  priority
+                />
+              </div>
+            </div>
+
             <p className="text-base md:text-lg font-semibold text-primary-700 mb-6">
               {totalValueLabel}
             </p>
-
             <HeroCTA />
           </div>
 
-          {/* Hero image / bundle preview */}
-          <div className="relative">
+          {/* Hero image / bundle preview - desktop only */}
+          <div className="hidden md:block relative">
             <div className="blob bg-indigo-300 w-40 h-40 -top-10 -left-6" />
             <div className="blob bg-pink-300 w-40 h-40 -bottom-6 -right-8" />
             <div className="relative card overflow-hidden shadow-xl border border-gray-200/80">
@@ -242,6 +259,9 @@ export default function OfferPage({ params, searchParams }: OfferPageProps) {
 
         {/* Deep-dive alternating sections */}
         <section className="mt-16 md:mt-20 space-y-12 md:space-y-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center md:text-left">
+            What&apos;s Inside
+          </h2>
           {resources.map((resource, index) => {
             const imageOnLeft = index % 2 === 0
             return (
