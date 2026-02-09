@@ -12,8 +12,9 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   const pathname = usePathname()
   const isLandingPage = pathname.startsWith('/landing/')
   const isToolsListPage = pathname === '/tools-list'
+  const isOfferPage = pathname.startsWith('/offer/')
 
-  if (isLandingPage || isToolsListPage) {
+  if (isLandingPage || isToolsListPage || isOfferPage) {
     return <>{children}</>
   }
 
