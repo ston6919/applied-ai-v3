@@ -19,29 +19,7 @@ export async function GET(request: NextRequest) {
         ? originHeader
         : 'http://127.0.0.1:3007'
 
-    // Try to retrieve the promotion code and apply discount
-    // If it fails (e.g., test/live mode mismatch), continue without discount
-    let discounts: Array<{ coupon: string }> | undefined
-    
-    try {
-      const promotionCode = await stripe.promotionCodes.retrieve(
-        'promo_1SyuWZRosRcw9chfcsvuOZ68',
-        { expand: ['coupon'] }
-      )
-      const couponId = typeof promotionCode.coupon === 'string' 
-        ? promotionCode.coupon 
-        : promotionCode.coupon.id
-      discounts = [
-        {
-          coupon: couponId,
-        },
-      ]
-    } catch (promoError: any) {
-      console.warn('Could not apply promotion code, continuing without discount:', promoError.message)
-      // Continue without discount - useful for test mode when promo is in live mode
-    }
-
-    const sessionConfig: any = {
+    const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [
         {
@@ -49,16 +27,14 @@ export async function GET(request: NextRequest) {
           quantity: 1,
         },
       ],
+      discounts: [
+        {
+          promotion_code: 'promo_1SyuWZRosRcw9chfcsvuOZ68',
+        },
+      ],
       success_url: `${origin}/offer/ai-power-pack?success=true`,
       cancel_url: `${origin}/offer/ai-power-pack?canceled=true`,
-    }
-
-    // Only add discounts if we successfully retrieved the promotion code
-    if (discounts) {
-      sessionConfig.discounts = discounts
-    }
-
-    const session = await stripe.checkout.sessions.create(sessionConfig)
+    })
 
     if (!session.url) {
       return NextResponse.json(
@@ -80,4 +56,3 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-
