@@ -23,12 +23,17 @@ export async function GET(request: NextRequest) {
       mode: 'subscription',
       line_items: [
         {
-          price: 'price_1SzHcORosRcw9chf8Y5ASWLj',
+          price: 'price_1SzK8GRosRcw9chf7367IZsG',
           quantity: 1,
         },
       ],
-      // Allow customers to enter a promo / coupon code on the checkout page
-      allow_promotion_codes: true,
+      // Automatically apply mastermind discount coupon.
+      // Note: Stripe does not allow using both `discounts` and `allow_promotion_codes` together.
+      discounts: [
+        {
+          coupon: 'Z8Zdjl4m',
+        },
+      ],
       success_url: `${origin}/offer/mastermind/thank-you`,
       cancel_url: `${origin}/offer/mastermind?canceled=true`,
     })

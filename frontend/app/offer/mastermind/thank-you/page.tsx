@@ -1,8 +1,8 @@
-import Link from 'next/link'
+import Image from 'next/image'
 
 export default function MastermindThankYouPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 py-12 md:py-16">
+    <div className="py-8 md:py-16">
       <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-56">
         <div className="max-w-2xl mx-auto card bg-white/90 border border-gray-200 text-center space-y-6">
           <div className="space-y-3">
@@ -10,10 +10,10 @@ export default function MastermindThankYouPage() {
               Applied AI Mastermind
             </p>
             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-              Thank you for joining the mastermind
+              You&apos;re in – here&apos;s how to get access
             </h1>
             <p className="text-gray-700 text-sm md:text-base">
-              You&apos;re in. Welcome to a community of people using AI to actually move the needle in their businesses.
+              Amazing work. You&apos;ve just taken a real step towards using AI strategically in your business—not just collecting more tools.
             </p>
           </div>
 
@@ -26,20 +26,30 @@ export default function MastermindThankYouPage() {
               <li>✔ Once you&apos;re in, introduce yourself and share what you&apos;re working on.</li>
               <li>✔ Start exploring the courses, templates, and call replays inside the community space.</li>
             </ul>
+
+            <div className="mt-4">
+              <p className="text-xs md:text-sm text-gray-500 mb-2">
+                The email will look like this – look for the invite from Skool and click &quot;Join now&quot; to get into the community:
+              </p>
+              <div className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+                <Image
+                  src="/assets/Screenshot_2026-02-10_at_6.23.41_pm-54642c6c-9b67-4128-9e67-db6e14f03319.png"
+                  alt="Example of the Applied AI Mastermind Skool invite email with a Join Now button"
+                  width={1024}
+                  height={499}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-xs md:text-sm text-gray-500">
-              If you don&apos;t receive your invite email within 10–15 minutes, reply to your purchase receipt or contact support and we&apos;ll help you
-              get access.
-            </p>
-            <Link
-              href="/offer/mastermind"
-              className="inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm md:text-base font-semibold btn-gradient btn-shimmer"
-            >
-              Back to mastermind page
-            </Link>
-          </div>
+          <p className="text-xs md:text-sm text-gray-500">
+            If you don&apos;t receive your invite email within 10–15 minutes, check spam and promotions, then email{' '}
+            <a href="mailto:matt@matt-penny.com" className="underline">
+              matt@matt-penny.com
+            </a>{' '}
+            and we&apos;ll help you get access.
+          </p>
         </div>
       </div>
     </div>

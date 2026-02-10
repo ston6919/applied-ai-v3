@@ -20,6 +20,22 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-HZ7PNXLQW5"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-HZ7PNXLQW5');
+            `,
+          }}
+        />
+        <Script
           src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
           async
         />

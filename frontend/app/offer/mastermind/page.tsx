@@ -28,7 +28,7 @@ function StickyMastermindButton() {
         prefetch={false}
         className="pointer-events-auto bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white text-sm md:text-base px-4 md:px-5 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
       >
-        <span>Join the mastermind – $37/mo</span>
+        <span>Join the mastermind – $29/mo</span>
         <span aria-hidden="true">→</span>
       </Link>
     </div>
@@ -112,12 +112,12 @@ function VideoSection() {
           <div className="text-center mb-3">
             <div className="flex items-baseline justify-center gap-3">
               <span className="text-base md:text-lg text-gray-500 line-through">Normally $99/mo</span>
-              <span className="text-3xl md:text-4xl font-extrabold text-gray-900">$37</span>
+              <span className="text-3xl md:text-4xl font-extrabold text-gray-900">$29</span>
               <span className="text-sm text-gray-600">per month</span>
             </div>
             <p className="mt-2 text-sm text-gray-700">
-              Join now to lock in this price <span className="font-semibold">forever</span>. As more content is added, the public price will rise—but
-              yours won&apos;t.
+              You won&apos;t see Applied AI Mastermind at this price again. Join now to lock in{' '}
+              <span className="font-semibold">$29/month forever</span>—once it increases for new members, it stays higher.
             </p>
           </div>
           <Link
@@ -125,7 +125,7 @@ function VideoSection() {
             prefetch={false}
             className="btn-gradient btn-shimmer text-base md:text-lg px-8 py-3 rounded-full text-center font-semibold disabled:opacity-60"
           >
-            Join Applied AI Mastermind for $37/month
+            Join Applied AI Mastermind for $29/month
           </Link>
           <p className="mt-2 text-xs text-gray-600 text-center">
             14-day risk-free guarantee. If it&apos;s not for you, get a full refund.
@@ -141,33 +141,31 @@ export default function MastermindSalesPage() {
     <div className="py-8 md:py-16">
       <StickyMastermindButton />
       <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-56">
-        {/* Context / urgency bar */}
+        {/* Context / welcome bar */}
         <div className="mb-6 flex justify-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-primary-50/80 px-4 py-2 text-sm font-medium text-primary-800 shadow-sm">
-            <span className="inline-flex h-2 w-2 min-h-2 min-w-2 flex-shrink-0 rounded-full bg-red-400 animate-pulse" />
-            <span>Price increases when 4 more people join – lock in your price now</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-primary-50/80 px-4 py-2 text-xs md:text-sm font-medium text-primary-800 shadow-sm text-center">
+            <span className="inline-flex h-2 w-2 min-h-2 min-w-2 flex-shrink-0 rounded-full bg-emerald-400 animate-pulse" />
+            <span>
+              Your resources are on their way to you – check your email. But I have something special for you...
+            </span>
           </div>
         </div>
 
         {/* Hero + video (single column) */}
         <section className="flex flex-col gap-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold gradient-text text-soft-shadow text-center">
-            Stop drowning in AI tools.
-            <br className="hidden md:block" />
-            Start using AI to actually grow your business.
+            Learn To Build AI Automations That Save Time and Drive Revenue
           </h1>
+          <span className="block text-sm md:text-base font-semibold text-red-600 text-center">
+            This page is a one-time offer. You will not see this again.
+          </span>
 
           {/* Video directly under the headline */}
           <VideoSection />
-
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
-            <div className="space-y-2">
-              <p className="text-xs uppercase tracking-[0.18em] text-primary-600 font-semibold">
-                Founding member pricing • Updated: 10th Feb 2026
-              </p>
-            </div>
-          </div>
         </section>
+
+        {/* One-time offer highlight (card removed in browser preview) */}
+        <section className="mt-10 md:mt-14" />
 
         {/* The gap & positioning – before & after */}
         <section className="mt-16 md:mt-20">
@@ -188,9 +186,9 @@ export default function MastermindSalesPage() {
                 After Applied AI Mastermind
               </p>
               <ul className="space-y-2 text-gray-700 text-sm md:text-base">
-                <li>✔ A short, clear list of AI projects that matter for your business.</li>
-                <li>✔ Simple, stable automations quietly running in the background.</li>
-                <li>✔ A repeatable way to turn ideas into flows using proven templates.</li>
+                <li>✔ All the core skills you need to design, build, and maintain AI automations and agents.</li>
+                <li>✔ A library of 2000+ prebuilt n8n automations so you never have to start from a blank canvas.</li>
+                <li>✔ Clarity on exactly where AI should (and shouldn&apos;t) be applied in your business for real leverage.</li>
                 <li>✔ Confidence you&apos;re not falling behind as AI moves forward.</li>
               </ul>
             </div>
@@ -211,7 +209,7 @@ export default function MastermindSalesPage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="card border border-gray-200">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Pillar 1</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Full Video Course</p>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">AI Fundamentals</h3>
               <p className="text-sm md:text-base text-gray-700 mb-3">
                 The essential building blocks so you actually understand what you&apos;re working with—not just which buttons to press.
@@ -224,7 +222,7 @@ export default function MastermindSalesPage() {
             </div>
 
             <div className="card border border-gray-200">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Pillar 2</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Full Video Course</p>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Automation &amp; Agents with n8n</h3>
               <p className="text-sm md:text-base text-gray-700 mb-3">
                 Go from zero to building production-ready AI automations and agents that actually run in your business.
@@ -237,7 +235,7 @@ export default function MastermindSalesPage() {
             </div>
 
             <div className="card border border-gray-200">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Pillar 3</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Full Video Course</p>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">AI Applied to Business (Strategy)</h3>
               <p className="text-sm md:text-base text-gray-700 mb-3">
                 The crucial strategy piece: how AI actually creates business value, not just cool demos.
@@ -251,7 +249,7 @@ export default function MastermindSalesPage() {
             </div>
 
             <div className="card border border-gray-200">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Pillar 4</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Full Video Course</p>
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Your First $100k (for AI service providers)</h3>
               <p className="text-sm md:text-base text-gray-700 mb-3">
                 If you&apos;re selling AI services or building an AI agency, this shows you how to turn your skills into revenue.
@@ -277,18 +275,40 @@ export default function MastermindSalesPage() {
             </div>
 
             <div className="card border border-gray-200">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Community &amp; Support</p>
-              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
-                Live Calls, Daily AI News &amp; Resource Library
-              </h3>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">AI Resources</p>
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Applied AI Resources Library</h3>
               <p className="text-sm md:text-base text-gray-700 mb-3">
-                Stay up to date and never get stuck on your own.
+                A growing library of AI playbooks, prompts, workflows, and examples so you can copy, paste, and adapt what&apos;s already working.
+              </p>
+              <ul className="space-y-1.5 text-sm text-gray-700">
+                <li>✔ Implementation checklists and step-by-step guides.</li>
+                <li>✔ Prompt packs and swipe files you can plug into your own tools.</li>
+                <li>✔ Real-world examples of how other members are using AI.</li>
+              </ul>
+            </div>
+
+            <div className="card border border-gray-200">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Daily AI News</p>
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Curated Daily AI News Feed</h3>
+              <p className="text-sm md:text-base text-gray-700 mb-3">
+                Stay on top of fast-moving AI changes without drowning in noise.
+              </p>
+              <ul className="space-y-1.5 text-sm text-gray-700">
+                <li>✔ Daily curated AI news so you only see what matters.</li>
+                <li>✔ Focus on updates that actually impact how you use AI in your business.</li>
+                <li>✔ Clear context on what new releases mean in practical terms.</li>
+              </ul>
+            </div>
+
+            <div className="card border border-gray-200">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-600 mb-2">Community &amp; Support</p>
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Live Calls &amp; Real Support</h3>
+              <p className="text-sm md:text-base text-gray-700 mb-3">
+                Get direct help so you&apos;re never stuck on your own.
               </p>
               <ul className="space-y-1.5 text-sm text-gray-700">
                 <li>✔ Regular live calls with Matt and other members.</li>
                 <li>✔ Help with technical problems, strategy questions, and real use cases.</li>
-                <li>✔ Daily curated AI news so you only see what matters.</li>
-                <li>✔ Up-to-date resources on AI video, avatars, images, Notebook LM, advanced n8n workflows, and more.</li>
               </ul>
             </div>
           </div>
@@ -300,7 +320,7 @@ export default function MastermindSalesPage() {
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">What this really gives you</h2>
             <p className="text-gray-700 mb-4">
               At the end of the day, the mastermind isn&apos;t about learning more tools. It&apos;s about building a calmer, more profitable business that uses AI
-              in the right places.
+              in the right places—and giving you hard, practical skills that are incredibly useful in today&apos;s world.
             </p>
             <ul className="grid gap-2 text-sm md:text-base text-gray-800 md:grid-cols-2">
               <li>✔ Clarity on where AI fits into your specific business.</li>
@@ -389,8 +409,9 @@ export default function MastermindSalesPage() {
                 Lock in your rate and future-proof your business with AI.
               </h2>
               <p className="text-white/90 mb-4 text-sm md:text-base max-w-2xl mx-auto">
-                Join Applied AI Mastermind today for <span className="font-semibold">$37/month</span> (normally $99+/month). As more content and support are
-                added, the price will rise—but your rate is locked in for as long as you stay.
+                Join Applied AI Mastermind today for <span className="font-semibold">$29/month</span> (normally $99+/month). This is a{' '}
+                <span className="font-semibold">now-or-never price</span> tied to this page—when you leave, you won&apos;t see $29 again, but if you join now your
+                rate is locked in for as long as you stay.
               </p>
               <p className="text-white/90 mb-6 text-xs md:text-sm">
                 Try it risk-free for 14 days. If you&apos;re not happy, simply let us know and you&apos;ll get a full refund—no questions asked.
