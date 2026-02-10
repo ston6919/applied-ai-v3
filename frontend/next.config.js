@@ -32,10 +32,6 @@ const nextConfig = {
         destination: `${devBackendUrl}/api/mastermind/:path*`,
       },
       {
-        source: '/api/landing-pages/:path*',
-        destination: `${devBackendUrl}/api/landing-pages/:path*`,
-      },
-      {
         source: '/api/n8n-templates/:path*',
         destination: `${devBackendUrl}/api/n8n-templates/:path*`,
       },

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 interface LandingPageData {
@@ -26,6 +26,7 @@ interface LandingPageContentProps {
 
 export default function LandingPageContent({ initialData }: LandingPageContentProps) {
   const params = useParams()
+  const router = useRouter()
   const slug = params.slug as string
   const [landingPage] = useState<LandingPageData>(initialData)
   const [currentStep, setCurrentStep] = useState<'email' | 'name' | 'business_type' | 'complete'>('email')
@@ -55,20 +56,44 @@ export default function LandingPageContent({ initialData }: LandingPageContentPr
         })
       })
 
-      const result = await response.json()
+      // Safely handle both JSON and non-JSON error responses
+      let result: any = null
+      let fallbackText: string | null = null
+
+      try {
+        const contentType = response.headers.get('content-type') || ''
+        if (contentType.includes('application/json')) {
+          result = await response.json()
+        } else {
+          fallbackText = await response.text()
+        }
+      } catch (parseError) {
+        console.error('Error parsing landing page response:', parseError)
+      }
 
       if (!response.ok) {
-        throw new Error(result.error || 'Submission failed')
+        const message =
+          (result && result.error) ||
+          fallbackText ||
+          'Something went wrong submitting your details. Please try again.'
+        throw new Error(message)
       }
 
       // Update form data
       setFormData(prev => ({ ...prev, ...data }))
 
-      // Move to next step
-      if (result.next_step) {
-        setCurrentStep(result.next_step as any)
-      } else if (result.completed) {
-        setCurrentStep('complete')
+      // Move to next step (only if we received structured JSON)
+      if (result) {
+        if (result.next_step) {
+          setCurrentStep(result.next_step as any)
+        } else if (result.completed) {
+          setCurrentStep('complete')
+        }
+
+        // After answering the business type question, send people to the mastermind offer page
+        if (step === 'business_type') {
+          router.push('/offer/mastermind')
+        }
       }
 
     } catch (err: any) {
