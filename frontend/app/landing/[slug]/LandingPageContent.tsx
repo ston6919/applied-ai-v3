@@ -89,11 +89,6 @@ export default function LandingPageContent({ initialData }: LandingPageContentPr
         } else if (result.completed) {
           setCurrentStep('complete')
         }
-
-        // After answering the business type question, send people to the mastermind offer page
-        if (step === 'business_type') {
-          router.push('/offer/mastermind')
-        }
       }
 
     } catch (err: any) {
@@ -303,39 +298,23 @@ export default function LandingPageContent({ initialData }: LandingPageContentPr
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Thank You, {formData.first_name}!
               </h2>
-              {landingPage.template_content && landingPage.template_content.trim() ? (
-                <>
-                  <p className="text-gray-600 mb-6">
-                    Your template is ready. Check your email for the download link.
-                  </p>
-                  <div className="bg-gray-50 rounded-lg p-4 text-left">
-                    <h3 className="font-semibold text-gray-900 mb-3">Your Template:</h3>
-                    <div className="prose prose-sm max-w-none">
-                      <pre className="whitespace-pre-wrap text-gray-700 text-sm">{landingPage.template_content}</pre>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-gray-600 mb-6">
-                    Go and check your emails and find the email from me.
-                  </p>
-                  <div className="bg-blue-50 rounded-lg p-4 text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Check Your Email</h3>
-                    <p className="text-gray-600 text-sm mb-2">
-                      Look for an email from me with your template attached.
-                    </p>
-                    <p className="text-gray-500 text-xs">
-                      Don't forget to check your spam folder too!
-                    </p>
-                  </div>
-                </>
-              )}
+              <p className="text-gray-600 mb-6">
+                Go and check your emails and find the email from me.
+              </p>
+              <div className="bg-blue-50 rounded-lg p-4 text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Check Your Email</h3>
+                <p className="text-gray-600 text-sm mb-2">
+                  It may take several minutes to arrive.
+                </p>
+                <p className="text-gray-500 text-xs">
+                  Don't forget to check your spam folder too!
+                </p>
+              </div>
             </div>
           )}
 

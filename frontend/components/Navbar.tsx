@@ -1,11 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 export default function Navbar() {
+  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const isCoursesPage = pathname.startsWith('/courses')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,17 +45,19 @@ export default function Navbar() {
 
           {/* Center: Menu pill */}
           <div className="justify-self-center">
-            <div className={`hidden md:flex items-center gap-4 rounded-full px-5 py-2 transition-all duration-300 ${
-              isScrolled 
-                ? 'shadow-sm border border-gray-200 backdrop-blur bg-white/70' 
-                : 'border border-gray-200/50 backdrop-blur-none bg-white/95'
-            }`}>
-              <Link href="/" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Home</Link>
-              <Link href="/news" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">News</Link>
-              <Link href="/tools" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Tools</Link>
-              <Link href="/templates" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Templates</Link>
-              <Link href="/work-with-us" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5 whitespace-nowrap">Work With Us</Link>
-            </div>
+            {!isCoursesPage ? (
+              <div className={`hidden md:flex items-center gap-4 rounded-full px-5 py-2 transition-all duration-300 ${
+                isScrolled 
+                  ? 'shadow-sm border border-gray-200 backdrop-blur bg-white/70' 
+                  : 'border border-gray-200/50 backdrop-blur-none bg-white/95'
+              }`}>
+                <Link href="/" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Home</Link>
+                <Link href="/news" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">News</Link>
+                <Link href="/tools" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Tools</Link>
+                <Link href="/templates" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5">Templates</Link>
+                <Link href="/work-with-us" className="px-3 py-1 rounded-full text-gray-700 hover:text-primary-600 transition-all hover:ring-2 hover:ring-primary-300/70 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none hover:py-0.5 focus-visible:py-0.5 whitespace-nowrap">Work With Us</Link>
+              </div>
+            ) : null}
           </div>
 
           {/* Right: Gradient CTA */}
@@ -63,7 +68,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className="btn-gradient"
             >
-              Join the Mastermind
+              {isCoursesPage ? 'Go to Mastermind' : 'Join the Mastermind'}
             </a>
           </div>
 
@@ -85,18 +90,22 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <div className="flex flex-col space-y-4">
-              <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Home</Link>
-              <Link href="/news" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>News</Link>
-              <Link href="/tools" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Tools</Link>
-              <Link href="/templates" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Templates</Link>
-              <Link href="/work-with-us" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Work With Us</Link>
+              {!isCoursesPage ? (
+                <>
+                  <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Home</Link>
+                  <Link href="/news" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>News</Link>
+                  <Link href="/tools" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Tools</Link>
+                  <Link href="/templates" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Templates</Link>
+                  <Link href="/work-with-us" className="text-gray-700 hover:text-primary-600 transition-colors" onClick={() => setIsMenuOpen(false)}>Work With Us</Link>
+                </>
+              ) : null}
               <a
                 href="https://www.skool.com/applied-ai-mastermind-9612"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-gradient text-center"
               >
-                Join the Mastermind
+                {isCoursesPage ? 'Go to Mastermind' : 'Join the Mastermind'}
               </a>
             </div>
           </div>
