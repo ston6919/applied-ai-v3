@@ -1,10 +1,13 @@
+import { toVibeCodingYouTubeEmbedUrl } from '@/lib/youtubeEmbed'
 import VibeCodingVideoPage from '../VibeCodingVideoPage'
 
 export default function Plc1RevolutionPage() {
   return (
     <VibeCodingVideoPage
       title="Day 1: The Vibe Coding Revolution"
-      youtubeEmbedUrl="https://www.youtube.com/embed/VIDEO_ID_HERE?rel=0&modestbranding=1&controls=1&enablejsapi=1"
+      youtubeEmbedUrl={toVibeCodingYouTubeEmbedUrl(
+        process.env.NEXT_PUBLIC_VIBE_CODING_PLC1_YOUTUBE_URL
+      )}
     />
   )
 }

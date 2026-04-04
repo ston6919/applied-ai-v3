@@ -1,10 +1,13 @@
+import { toVibeCodingYouTubeEmbedUrl } from '@/lib/youtubeEmbed'
 import VibeCodingVideoPage from '../VibeCodingVideoPage'
 
 export default function OcJoinPage() {
   return (
     <VibeCodingVideoPage
       title="OC Join"
-      youtubeEmbedUrl="https://www.youtube.com/embed/VIDEO_ID_HERE?rel=0&modestbranding=1&controls=1&enablejsapi=1"
+      youtubeEmbedUrl={toVibeCodingYouTubeEmbedUrl(
+        process.env.NEXT_PUBLIC_VIBE_CODING_OC_JOIN_YOUTUBE_URL
+      )}
       ctaLabel="Accept Deal"
       ctaUrl="/api/checkout-oc-join"
     />
