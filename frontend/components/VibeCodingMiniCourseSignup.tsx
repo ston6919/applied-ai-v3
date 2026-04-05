@@ -62,10 +62,10 @@ export default function VibeCodingMiniCourseSignup() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 md:py-16">
+    <div className="container mx-auto px-4 pt-4 pb-10 md:py-16">
       <div className="max-w-xl mx-auto">
-        <header className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold gradient-text text-soft-shadow mb-4">
+        <header className="text-center mb-5 md:mb-10">
+          <h1 className="text-4xl md:text-5xl font-extrabold gradient-text text-soft-shadow mb-2 md:mb-4">
             Free 3-Day Vibe Coding Mini Course
           </h1>
           <p className="text-xl md:text-2xl font-semibold text-gray-800 max-w-xl mx-auto leading-snug">
