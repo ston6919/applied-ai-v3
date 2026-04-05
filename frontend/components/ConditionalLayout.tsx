@@ -14,8 +14,15 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   const isToolsListPage = pathname === '/tools-list'
   const isOfferPage = pathname.startsWith('/offer/')
   const isVibeCodingPage = pathname.startsWith('/vibe-coding/')
+  const isVibeCodingMiniCoursePage = pathname.startsWith('/vibe-coding-mini-course')
 
-  if (isLandingPage || isToolsListPage || isOfferPage || isVibeCodingPage) {
+  if (
+    isLandingPage ||
+    isToolsListPage ||
+    isOfferPage ||
+    isVibeCodingPage ||
+    isVibeCodingMiniCoursePage
+  ) {
     return <>{children}</>
   }
 
