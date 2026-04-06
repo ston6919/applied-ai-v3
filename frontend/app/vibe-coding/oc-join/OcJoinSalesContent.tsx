@@ -141,34 +141,40 @@ export default function OcJoinSalesContent({
             <span className="inline-block w-10 shrink-0" aria-hidden />
             <p className="text-center text-sm font-semibold text-emerald-700">After</p>
           </div>
-          {HOW_HELP_DETAIL_PAIRS.map((pair) => (
-            <div
-              key={pair.before}
-              className="flex w-full flex-col items-stretch gap-3 md:flex-row md:items-center md:gap-4"
-            >
-              <div className={transitionBoxClass}>
-                <p className="text-base font-bold text-gray-900 text-balance md:text-lg">{pair.before}</p>
-              </div>
+          <div className="flex flex-col md:gap-4">
+            {HOW_HELP_DETAIL_PAIRS.map((pair, index) => (
               <div
-                className="flex shrink-0 items-center justify-center text-2xl font-bold text-violet-600 md:w-10 md:text-3xl"
-                aria-hidden
+                key={pair.before}
+                className={`flex w-full flex-col items-stretch gap-3 md:flex-row md:items-center md:gap-4 ${
+                  index > 0
+                    ? 'mt-8 border-t border-gray-300 pt-8 md:mt-0 md:border-t-0 md:pt-0'
+                    : ''
+                }`}
               >
-                <span className="hidden md:inline">→</span>
-                <span className="md:hidden">↓</span>
+                <div className={transitionBoxClass}>
+                  <p className="text-base font-bold text-gray-900 text-balance md:text-lg">{pair.before}</p>
+                </div>
+                <div
+                  className="flex shrink-0 items-center justify-center text-2xl font-bold text-violet-600 md:w-10 md:text-3xl"
+                  aria-hidden
+                >
+                  <span className="hidden md:inline">→</span>
+                  <span className="md:hidden">↓</span>
+                </div>
+                <div className={transitionBoxClass}>
+                  <p className="text-base font-bold text-gray-900 text-balance md:text-lg">{pair.after}</p>
+                </div>
               </div>
-              <div className={transitionBoxClass}>
-                <p className="text-base font-bold text-gray-900 text-balance md:text-lg">{pair.after}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Course intro */}
       <section className="flex flex-col gap-4 text-center" aria-labelledby="course-intro-heading">
-        <p className={eyebrow}>The programme</p>
+        <p className={eyebrow}>Introducing...</p>
         <h2 id="course-intro-heading" className={`${sectionTitle} max-w-3xl mx-auto`}>
-          Vibe Coding <span className="gradient-text">Mastery</span> course
+          Vibe Coding <span className="gradient-text">Mastery</span> Course
         </h2>
         <p className={`${body} text-lg max-w-2xl mx-auto`}>
           Step-by-step training from zero to shipping real software. No traditional coding background
