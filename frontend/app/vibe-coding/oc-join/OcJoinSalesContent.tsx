@@ -488,18 +488,43 @@ export default function OcJoinSalesContent({
             <p className="mb-6 text-center text-sm font-bold uppercase tracking-[0.14em] text-violet-800 md:text-lg">
               Three-day action taker deal
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
+            {/* Mobile: stack offer first, huge $379, then comparison price */}
+            <div className="flex flex-col items-center gap-6 md:hidden">
+              <div className="w-full text-center">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-violet-700">
+                  Next 3 days only
+                </p>
+                <p className="text-[2.75rem] font-extrabold leading-none tracking-tight text-violet-600 tabular-nums sm:text-6xl">
+                  $379
+                </p>
+              </div>
+              <div className="flex w-full max-w-sm items-center gap-3 px-2" aria-hidden>
+                <div className="h-px flex-1 bg-gray-300" />
+                <span className="shrink-0 text-[0.65rem] font-bold uppercase tracking-wider text-gray-500">
+                  Then
+                </span>
+                <div className="h-px flex-1 bg-gray-300" />
+              </div>
               <div className="text-center">
                 <p className="text-xs font-bold uppercase text-gray-600">When the 3 days end</p>
-                <p className="text-3xl md:text-4xl font-extrabold text-gray-900 tabular-nums">$700</p>
+                <p className="mt-1 text-3xl font-extrabold tabular-nums text-gray-900">$700</p>
                 <p className={`${body} mt-1 text-xs`}>full price again</p>
               </div>
-              <span className="text-2xl text-gray-400 hidden sm:inline" aria-hidden>
+            </div>
+
+            {/* Desktop: side by side with arrow */}
+            <div className="hidden items-center justify-center gap-8 md:flex">
+              <div className="text-center">
+                <p className="text-xs font-bold uppercase text-gray-600">When the 3 days end</p>
+                <p className="text-3xl font-extrabold tabular-nums text-gray-900 md:text-4xl">$700</p>
+                <p className={`${body} mt-1 text-xs`}>full price again</p>
+              </div>
+              <span className="text-2xl text-gray-400" aria-hidden>
                 →
               </span>
               <div className="text-center">
                 <p className="text-xs font-bold uppercase text-violet-700">Next 3 days only</p>
-                <p className="text-4xl md:text-5xl font-extrabold text-violet-600 tabular-nums">
+                <p className="text-4xl font-extrabold tabular-nums text-violet-600 md:text-5xl">
                   $379
                 </p>
               </div>
