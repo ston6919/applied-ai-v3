@@ -34,7 +34,7 @@ const HOW_HELP_DETAIL_PAIRS = [
   },
   {
     before: 'Best ideas live in your head or on sticky notes',
-    after: 'Launch products and new income streams from scratch',
+    after: 'Ship products and new income streams from scratch',
   },
   {
     before: 'Tech feels like something that happens to other people',
@@ -76,7 +76,7 @@ const OC_JOIN_FAQ_ITEMS: OcJoinFaqItem[] = [
     question: 'What if it is not worth the price?',
     lead: 'It is a fair thing to ask. And here is the thing: you do not have to take my word for it.',
     answer:
-      'Worth remembering: $379 is the 3-day launch price. In a few days this goes to $700, and it will keep rising as new content is added. So relative to what it will cost, today is the best deal this course will ever be at. But if you still have doubts, that is exactly what the 14-day guarantee is for. Get inside. Watch the first modules. Start building. If within 14 days you do not see the value, if you genuinely do not feel like this is going to change what is possible for you, just send us one email and we will refund every penny. No awkward questions, no hoops. The risk is entirely on our side. Yours is zero.',
+      'Worth remembering: $379 is only available for this three-day window. After that it goes to $700, and the price will keep rising as new content is added. So relative to what it will cost later, right now is the best deal this course will be at for a while. But if you still have doubts, that is exactly what the 14-day guarantee is for. Get inside. Watch the first modules. Start building. If within 14 days you do not see the value, if you genuinely do not feel like this is going to change what is possible for you, just send us one email and we will refund every penny. No awkward questions, no hoops. The risk is entirely on our side. Yours is zero.',
   },
 ]
 
@@ -485,30 +485,25 @@ export default function OcJoinSalesContent({
             </p>
           </div>
           <div className="rounded-2xl border border-violet-200 bg-violet-50/60 px-6 py-8">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-800 mb-4">
-              Action taker price, limited window
+            <p className="mb-6 text-center text-sm font-bold uppercase tracking-[0.14em] text-violet-800 md:text-lg">
+              Three-day action taker deal
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-              <div className="text-center opacity-50">
-                <p className="text-xs font-bold uppercase text-gray-500">Normal price</p>
-                <p className="text-3xl md:text-4xl font-extrabold text-gray-500 line-through tabular-nums">
-                  $700
-                </p>
+              <div className="text-center">
+                <p className="text-xs font-bold uppercase text-gray-600">When the 3 days end</p>
+                <p className="text-3xl md:text-4xl font-extrabold text-gray-900 tabular-nums">$700</p>
+                <p className={`${body} mt-1 text-xs`}>full price again</p>
               </div>
               <span className="text-2xl text-gray-400 hidden sm:inline" aria-hidden>
                 →
               </span>
               <div className="text-center">
-                <p className="text-xs font-bold uppercase text-violet-700">Today</p>
+                <p className="text-xs font-bold uppercase text-violet-700">Next 3 days only</p>
                 <p className="text-4xl md:text-5xl font-extrabold text-violet-600 tabular-nums">
                   $379
                 </p>
               </div>
             </div>
-            <p className={`${body} text-sm italic mt-4`}>
-              One-off · price returns to $700 after the launch window (e.g. 3 days) · your charge at
-              checkout is always the final amount
-            </p>
             <div className="mt-6 flex justify-center">
               <a
                 href={ctaUrl}
