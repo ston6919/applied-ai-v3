@@ -1,8 +1,11 @@
+import type { ReactNode } from 'react'
+
 interface VibeCodingVideoPageProps {
   title: string
   youtubeEmbedUrl: string
   ctaLabel?: string
   ctaUrl?: string
+  children?: ReactNode
 }
 
 export default function VibeCodingVideoPage({
@@ -10,6 +13,7 @@ export default function VibeCodingVideoPage({
   youtubeEmbedUrl,
   ctaLabel,
   ctaUrl,
+  children,
 }: VibeCodingVideoPageProps) {
   const isPlaceholder = !youtubeEmbedUrl || youtubeEmbedUrl.includes('VIDEO_ID_HERE')
 
@@ -49,6 +53,8 @@ export default function VibeCodingVideoPage({
           {ctaLabel}
         </a>
       ) : null}
+
+      {children}
     </section>
   )
 }
