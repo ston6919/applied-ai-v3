@@ -86,9 +86,7 @@ export default async function LessonPage({ params }: PageProps) {
 
       {lesson.content_text ? (
         <article className="prose prose-gray mt-6 max-w-none rounded-xl border border-gray-200 bg-white p-5">
-          {lesson.content_text.split('\n').map((line, index) => (
-            <p key={`${index}-${line.slice(0, 12)}`}>{line}</p>
-          ))}
+          <p className="whitespace-pre-line">{lesson.content_text}</p>
         </article>
       ) : null}
 

@@ -192,9 +192,7 @@ export default async function CourseModulesPage({ params, searchParams }: PagePr
 
                 {selectedLesson.content_text ? (
                   <article className="prose prose-gray mt-6 max-w-none">
-                    {selectedLesson.content_text.split('\n').map((line, index) => (
-                      <p key={`${index}-${line.slice(0, 12)}`}>{line}</p>
-                    ))}
+                    <p className="whitespace-pre-line">{selectedLesson.content_text}</p>
                   </article>
                 ) : null}
 
