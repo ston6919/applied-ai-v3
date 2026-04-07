@@ -100,9 +100,12 @@ export default async function CourseModulesPage({ params, searchParams }: PagePr
   }
 
   const requestedLessonId = searchParams?.lessonId
-  const selectedLesson =
-    lessons.find((lesson) => lesson.id === requestedLessonId) ||
-    (lessons.length > 0 ? lessons[0] : null)
+  const selectedLessonFromQuery = lessons.find((lesson) => lesson.id === requestedLessonId) ?? null
+  const defaultLesson =
+    modules
+      .map((module) => lessons.find((lesson) => lesson.module_id === module.id) ?? null)
+      .find((lesson) => lesson !== null) ?? null
+  const selectedLesson = selectedLessonFromQuery ?? defaultLesson
   const selectedEmbedUrl = toYouTubeEmbedUrl(selectedLesson?.youtube_url ?? null)
 
   return (
@@ -172,11 +175,14 @@ export default async function CourseModulesPage({ params, searchParams }: PagePr
                 <h2 className="text-2xl font-semibold text-gray-900">{selectedLesson.title || 'Untitled lesson'}</h2>
 
                 {selectedEmbedUrl ? (
-                  <div className="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-black">
+                  <div
+                    className="relative mt-4 w-full overflow-hidden rounded-xl border border-gray-200 bg-black"
+                    style={{ aspectRatio: '16 / 9' }}
+                  >
                     <iframe
                       title={selectedLesson.title || 'Lesson video'}
                       src={selectedEmbedUrl}
-                      className="h-[240px] w-full md:h-[480px]"
+                      className="absolute inset-0 h-full w-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allowFullScreen

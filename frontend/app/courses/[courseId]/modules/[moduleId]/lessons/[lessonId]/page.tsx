@@ -69,11 +69,14 @@ export default async function LessonPage({ params }: PageProps) {
       <h1 className="mt-4 text-3xl font-bold text-gray-900">{lesson.title || 'Untitled lesson'}</h1>
 
       {embedUrl ? (
-        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-black">
+        <div
+          className="relative mt-6 w-full overflow-hidden rounded-xl border border-gray-200 bg-black"
+          style={{ aspectRatio: '16 / 9' }}
+        >
           <iframe
             title={lesson.title || 'Lesson video'}
             src={embedUrl}
-            className="h-[240px] w-full md:h-[480px]"
+            className="absolute inset-0 h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
