@@ -11,8 +11,8 @@ const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2026-01-28.clover',
 })
 
-const OC_JOIN_PRICE_ID = 'price_1TH7QqRosRcw9chfDN8bfqpa'
-const OC_JOIN_PROMO_ID = 'promo_1TH8NMRosRcw9chfqwcgQ3su'
+const OC_JOIN_PRICE_ID = 'price_1TJHEqRosRcw9chfiVNbxlz7'
+const OC_JOIN_PROMO_ID = 'promo_1TJHHpRosRcw9chf6uAq2PE5'
 
 export async function GET(request: NextRequest) {
   try {
