@@ -25,16 +25,12 @@ const HOW_HELP_DETAIL_PAIRS = [
     after: 'Bring ideas to life in a weekend',
   },
   {
-    before: 'Running a manual, messy business',
+    before: 'Running many boring & repetative tasks',
     after: 'An automated business powered by AI',
   },
   {
-    before: 'Paying developers heavily or abandoning ideas',
+    before: 'Hiring expensive developers',
     after: 'Build what your business needs without hiring a team',
-  },
-  {
-    before: 'Best ideas live in your head or on sticky notes',
-    after: 'Ship products and new income streams from scratch',
   },
   {
     before: 'Tech feels like something that happens to other people',
@@ -51,13 +47,6 @@ const OC_JOIN_FAQ_ITEMS: OcJoinFaqItem[] = [
       'This course was built specifically for people who have zero technical background. You never write a single line of code, not in lesson one, not ever. You describe what you want in plain English, the same way you would explain it to a developer. The AI does the technical work. Your job is to think clearly about what you want to build. That is it. If you can send a detailed email, you can do this.',
   },
   {
-    id: 'ai-wrong',
-    question: 'What if the AI gets it wrong?',
-    lead: 'It will, sometimes. That is perfectly okay. Here is why it does not matter as much as you think.',
-    answer:
-      'You do not need to read code to know something is wrong. You just need to test the output. Does the button work? Does the data save? Is this what I asked for? You are checking outcomes, not debugging syntax. When something is off, you describe the gap in plain English: "The name is not saving when I click submit. Fix it." The AI corrects it. You test again. That loop is your entire skill set, and anyone can do it from day one.',
-  },
-  {
     id: 'time',
     question: 'What if I do not have time?',
     lead: 'Life is busy. It is a completely valid concern. Here is what the reality looks like.',
@@ -65,15 +54,29 @@ const OC_JOIN_FAQ_ITEMS: OcJoinFaqItem[] = [
       'The first module gets you building something real (a working, functional app) in your very first sitting. There is no lengthy setup, no background reading required. It is hands-on from lesson one. More importantly, the time you spend learning this pays back immediately. Every tool you build saves hours. Every automation you set up runs while you sleep. If you can carve out a weekend to get started, you will quickly find this creates time. It does not eat it.',
   },
   {
-    id: 'calm-down',
-    question: 'What if I want to wait until things calm down?',
-    lead: 'Completely understandable. Life does not stop for courses. Here is why that is actually fine, and why today still matters.',
+    id: 'live-sessions',
+    question: 'Do I have to attend live sesions?',
+    lead: 'No. The core course is designed to fit your schedule, not the other way around.',
     answer:
-      'You do not have to start now, and that is kind of the point. This course goes entirely at your pace, in your own time. There are no deadlines, no live sessions to miss, no pressure to sprint through it. Come back to it in a month, three months, six months: it will be here. Because we add new material regularly, it will always reflect the latest tools and techniques. You will not return to something outdated. But here is the one thing that will not wait: the price. Today is the lowest it will ever be. Every update and new module we add moves the price up. The content stays fresh forever. This price does not.',
+      'You can go at your own pace. All of the core content is available to watch whenever you are ready, so there is no pressure to show up at a specific time. The only fixed-time events are extra livestreams I run and optional 1-to-1 calls. Everything else is built to be consumed at your pace.',
+  },
+  {
+    id: 'ai-wrong',
+    question: 'What if the AI gets it wrong?',
+    lead: 'It will, sometimes. That is perfectly okay. Here is why it does not matter as much as you think.',
+    answer:
+      'You do not need to read code to know something is wrong. You just need to test the output. Does the button work? Does the data save? Is this what I asked for? You are checking outcomes, not debugging syntax. When something is off, you describe the gap in plain English: "The name is not saving when I click submit. Fix it." The AI corrects it. You test again. That loop is your entire skill set, and anyone can do it from day one.',
+  },
+  {
+    id: 'outdated-fast',
+    question: 'Will this information get outdated fast?',
+    lead: 'Great question, especially in AI where tools move quickly. Here is how this is handled.',
+    answer:
+      'The course is built around principles that do not go out of date: how to think through what to build, how to prompt clearly, how to test outcomes, and how to turn ideas into working systems. On top of that, the tactical lessons are updated regularly as tools evolve, so you always have a current path to follow. You are not buying one static snapshot. You are getting a living course that keeps pace with the space.',
   },
   {
     id: 'price',
-    question: 'What if it is not worth the price?',
+    question: "What if I'm not happy after I buy?",
     lead: 'It is a fair thing to ask. And here is the thing: you do not have to take my word for it.',
     answer:
       'Worth remembering: $379 is only available for this three-day window. After that it goes to $700, and the price will keep rising as new content is added. So relative to what it will cost later, right now is the best deal this course will be at for a while. But if you still have doubts, that is exactly what the 14-day guarantee is for. Get inside. Watch the first modules. Start building. If within 14 days you do not see the value, if you genuinely do not feel like this is going to change what is possible for you, just send us one email and we will refund every penny. No awkward questions, no hoops. The risk is entirely on our side. Yours is zero.',
@@ -96,8 +99,8 @@ export default function OcJoinSalesContent({
           We are at a <span className="text-violet-600">once-in-a-generation</span> moment
         </h2>
         <p className={`${body} text-lg`}>
-          The world runs on software. Building it has never been this accessible. Most people have
-          not caught on yet, which is exactly where your advantage comes from.
+          Building software has never been this accessible. Most people have not caught on yet, which is
+          exactly where your advantage comes from.
         </p>
         <div className="grid gap-4 md:grid-cols-3 mt-2">
           <div
@@ -133,7 +136,7 @@ export default function OcJoinSalesContent({
           The shift
         </p>
         <h2 id="how-i-help-heading" className={sectionTitle}>
-          How I want to help you
+          How This Course Will Help You
         </h2>
         <div className="flex flex-col gap-4">
           <div className="hidden md:grid md:grid-cols-[1fr_auto_1fr] md:items-end md:gap-4">
@@ -196,7 +199,7 @@ export default function OcJoinSalesContent({
 
       {/* Transformation */}
       <section className="flex flex-col gap-4" aria-labelledby="transformation-heading">
-        <p className={eyebrow}>The transformation</p>
+        <p className={eyebrow}>What's In It For You</p>
         <h2 id="transformation-heading" className={sectionTitle}>
           From ideas you cannot build to a builder who can create{' '}
           <span className="text-violet-600">almost anything</span>
@@ -479,7 +482,7 @@ export default function OcJoinSalesContent({
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-0.5">
               Regular price
             </p>
-            <p className="text-2xl md:text-3xl font-extrabold text-gray-900 tabular-nums">$700</p>
+            <p className="text-lg md:text-xl font-bold text-gray-500 tabular-nums line-through">$700</p>
             <p className={`${body} text-xs md:text-sm mt-1.5`}>
               One-off · new content added regularly · yours to keep
             </p>
@@ -516,7 +519,7 @@ export default function OcJoinSalesContent({
             <div className="hidden items-center justify-center gap-8 md:flex">
               <div className="text-center">
                 <p className="text-xs font-bold uppercase text-gray-600">When the 3 days end</p>
-                <p className="text-3xl font-extrabold tabular-nums text-gray-900 md:text-4xl">$700</p>
+                <p className="text-lg md:text-xl font-bold tabular-nums text-gray-500 line-through">$700</p>
                 <p className={`${body} mt-1 text-xs`}>full price again</p>
               </div>
               <span className="text-2xl text-gray-400" aria-hidden>

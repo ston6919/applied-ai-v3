@@ -2,7 +2,7 @@ import { toVibeCodingYouTubeEmbedUrl } from '@/lib/youtubeEmbed'
 import VibeCodingVideoPage from '../VibeCodingVideoPage'
 import OcJoinSalesContent from './OcJoinSalesContent'
 
-const CTA_LABEL = 'Accept Deal'
+const CTA_LABEL = 'join now'
 const CTA_URL = '/api/checkout-oc-join'
 
 export default function OcJoinPage() {
